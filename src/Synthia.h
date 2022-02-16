@@ -3,6 +3,11 @@
 
 #include <Arduino.h>
 #include <CircuitOS.h>
+#include <Loop/LoopListener.h>
+#include <Devices/LEDmatrix/LEDmatrix.h>
+#include <Input/InputGPIO.h>
+
+extern LEDmatrixImpl LEDmatrix;
 
 class SynthiaImpl {
 public:
@@ -10,9 +15,13 @@ public:
 
 	void begin();
 
+	Input* getInput() const;
+
 private:
+	Input* input;
 
 };
 
 extern SynthiaImpl Synthia;
+
 #endif

@@ -1,9 +1,12 @@
 #include "Synthia.h"
 #include "Pins.hpp"
-#include <Devices/LEDmatrix/LEDmatrix.h>
+#include <Loop/LoopManager.h>
+
+LEDmatrixImpl LEDmatrix;
 
 SynthiaImpl Synthia;
-LEDmatrixImpl LEDmatrix;
+
+SynthiaImpl::SynthiaImpl(){}
 
 void SynthiaImpl::begin(){
 	Serial.println(115200);
@@ -13,5 +16,13 @@ void SynthiaImpl::begin(){
 		for(;;);
 	}
 
+	input = new InputGPIO();
+	InputGPIO::getInstance()->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5});
+	LoopManager::addListener(input);
 
 }
+
+Input* SynthiaImpl::getInput() const{
+	return input;
+}
+
