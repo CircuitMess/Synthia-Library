@@ -6,7 +6,9 @@
 #include <Loop/LoopListener.h>
 #include <Devices/LEDmatrix/LEDmatrix.h>
 #include <Input/InputGPIO.h>
+#include <driver/i2s.h>
 
+extern const i2s_pin_config_t i2s_pin_config;
 extern LEDmatrixImpl LEDmatrix;
 
 class SynthiaImpl {
