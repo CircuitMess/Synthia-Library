@@ -10,6 +10,13 @@
 #define BTN_2 16
 #define BTN_1 17
 
+#define POT_1 2
+#define POT_2 36
+
+#define I2S_BCK -1
+#define I2S_WS -1
+#define I2S_DO -1
+#define I2S_DI -1
 
 
 #endif //SYNTHIA_LIBRARY_PINS_HPP
