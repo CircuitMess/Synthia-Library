@@ -7,6 +7,8 @@
 #include <Devices/LEDmatrix/LEDmatrix.h>
 #include <Input/InputGPIO.h>
 #include <driver/i2s.h>
+#include "Input/SliderInput.h"
+#include "Input/EncoderInput.h"
 
 extern const i2s_pin_config_t i2s_pin_config;
 extern LEDmatrixImpl LEDmatrix;
@@ -25,5 +27,6 @@ private:
 };
 
 extern SynthiaImpl Synthia;
-
+extern SliderInput slider;
+extern EncoderInput encoder;
 #endif

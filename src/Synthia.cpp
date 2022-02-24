@@ -12,6 +12,8 @@ const i2s_pin_config_t i2s_pin_config = {
 LEDmatrixImpl LEDmatrix;
 
 SynthiaImpl Synthia;
+SliderInput slider;
+EncoderInput encoder;
 
 SynthiaImpl::SynthiaImpl(){}
 
@@ -23,8 +25,11 @@ void SynthiaImpl::begin(){
 		for(;;);
 	}
 
+	slider.begin();
+	encoder.begin();
+
 	input = new InputGPIO();
-	InputGPIO::getInstance()->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5});
+	InputGPIO::getInstance()->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_ENC_1, BTN_ENC_2});
 	LoopManager::addListener(input);
 
 }
