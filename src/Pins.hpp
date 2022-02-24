@@ -9,6 +9,14 @@
 #define BTN_3 5
 #define BTN_2 16
 #define BTN_1 17
+#define BTN_ENC_1 35
+#define BTN_ENC_2 25
+
+#define ENC_1A 34
+#define ENC_1B 32
+
+#define ENC_2A 33
+#define ENC_2B 26
 
 #define POT_1 2
 #define POT_2 36
