@@ -1,64 +1,58 @@
 #include <Loop/LoopManager.h>
 #include "EncoderInput.h"
+#include "../Pins.hpp"
 
 EncoderInput::EncoderInput(){
 
 }
 
 void EncoderInput::begin(){
-	pinMode(ENC_1A,INPUT);
-	pinMode(ENC_1B,INPUT);
+	pinMode(ENC_L1, INPUT);
+	pinMode(ENC_L2, INPUT);
+	pinMode(ENC_R1, INPUT);
+	pinMode(ENC_R2, INPUT);
 
-	pinMode(ENC_2A,INPUT);
-	pinMode(ENC_2B,INPUT);
 	LoopManager::addListener(this);
-
 }
 
-void EncoderInput::loop(uint _time){
-	currentStateLeft = digitalRead(ENC_1A);
-	currentStateRight = digitalRead(ENC_2A);
+void EncoderInput::loop(uint time){
+	int8_t leftVal = 0;
+	int8_t rightVal = 0;
 
-	if(currentStateLeft != previousStateLeft){
-		int encMovedValue;
-		if(digitalRead(ENC_1B) != currentStateLeft){
-			leftEncCounter++;
-			encMovedValue = 1;
+	int stateLeft = digitalRead(ENC_L1);
+	if(stateLeft != prevStateLeft){
+		if(digitalRead(ENC_L2) != stateLeft){
+			leftVal = 1;
 		}else{
-			leftEncCounter--;
-			encMovedValue = -1;
-		}
-		for(auto listeners: getListeners()){
-			listeners->leftEncMove(encMovedValue);
+			leftVal = -1;
 		}
 	}
-	previousStateLeft = currentStateLeft;
+	prevStateLeft = stateLeft;
 
-	if(currentStateRight != previousStateRight){
-		int encMovedValue;
-		if(digitalRead(ENC_2B) != currentStateRight){
-			rightEncCounter++;
-			encMovedValue = 1;
+	int stateRight = digitalRead(ENC_R1);
+	if(stateRight != prevStateRight){
+		if(digitalRead(ENC_R2) != stateRight){
+			rightVal = 1;
 		}else{
-			rightEncCounter--;
-			encMovedValue = -1;
-		}
-		for(auto listeners: getListeners()){
-			listeners->rightEnctMove(encMovedValue);
+			rightVal = -1;
 		}
 	}
-	previousStateRight = currentStateRight;
+	prevStateRight = stateRight;
+
+	if(leftVal != 0){
+		for(auto listeners: getListeners()){
+			listeners->leftEncMove(leftVal);
+		}
+	}
+
+	if(rightVal != 0){
+		for(auto listeners: getListeners()){
+			listeners->rightEncMove(rightVal);
+		}
+	}
 }
 
-int EncoderInput::getLeftEncValue() const{
-	return leftEncCounter;
-}
+void EncoderListener::leftEncMove(int8_t amount){ }
 
-int EncoderInput::getRightEncValue() const{
-	return rightEncCounter;
-}
-
-void SynthiaEncoderListener::leftEncMove(int8_t amount){ }
-
-void SynthiaEncoderListener::rightEnctMove(int8_t amount){ }
+void EncoderListener::rightEncMove(int8_t amount){ }
 

@@ -2,42 +2,29 @@
 #define SYNTHIA_LIBRARY_ENCODERINPUT_H
 
 #include <Loop/LoopListener.h>
-#include "../Pins.hpp"
-#include <vector>
 #include "../WithListeners.h"
 
 class EncoderInput;
 
-class SynthiaEncoderListener {
-	friend EncoderInput;
+class EncoderListener {
+friend EncoderInput;
 
 private:
-
 	virtual void leftEncMove(int8_t amount);
-	virtual void rightEnctMove(int8_t amount);
+	virtual void rightEncMove(int8_t amount);
+
 };
 
-class EncoderInput : public LoopListener, public WithListeners<SynthiaEncoderListener> {
-
+class EncoderInput : public LoopListener, public WithListeners<EncoderListener> {
 public:
 	EncoderInput();
 
 	void begin();
-
-	void loop(uint _time) override;
-
-	int getRightEncValue() const;
-
-	int getLeftEncValue() const;
+	void loop(uint time) override;
 
 private:
-	int leftEncCounter = 0;
-	int rightEncCounter = 0;
-
-	int currentStateLeft;
-	int currentStateRight;
-	int previousStateLeft;
-	int previousStateRight;
+	int prevStateLeft = 0;
+	int prevStateRight = 0;
 
 };
 

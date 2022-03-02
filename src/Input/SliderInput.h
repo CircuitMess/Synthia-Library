@@ -2,47 +2,44 @@
 #define SYNTHIA_LIBRARY_SLIDERINPUT_H
 
 #include <Loop/LoopListener.h>
-#include "../Pins.hpp"
-#include <vector>
 #include "../WithListeners.h"
 
 class SliderInput;
 
-class SynthiaSliderListener {
-	friend SliderInput;
+class SliderListener {
+friend SliderInput;
 
 private:
+	virtual void leftPotMove(uint8_t value);
+	virtual void rightPotMove(uint8_t value);
 
-	virtual void leftPotMove(uint8_t amount);
-	virtual void rightPotMove(uint8_t amount);
 };
 
-class SliderInput : public LoopListener, public WithListeners<SynthiaSliderListener> {
-
+class SliderInput : public LoopListener, public WithListeners<SliderListener> {
 public:
 	SliderInput();
 
 	void begin();
-
-	void loop(uint _time) override;
+	void loop(uint time) override;
 
 	uint8_t getLeftPotValue() const;
-
 	uint8_t getRightPotValue() const;
 
 private:
-	uint16_t leftPotValue;
-	uint16_t rightPotValue;
+	uint8_t leftPotValue;
+	uint8_t rightPotValue;
 
 	uint8_t leftPotPreviousValue;
 	uint8_t rightPotPreviousValue;
 
-	uint16_t leftlowPassFilter(uint16_t sensorValue);
-	uint16_t rightlowPassFilter(uint16_t sensorValue);
+	uint16_t leftFilter(uint16_t sensorValue);
+	uint16_t rightFilter(uint16_t sensorValue);
 
-	float EMA_a = 0.02;      //initialization of EMA alpha
-	int rightEMA_S = 0;          //initialization of EMA S
-	int leftEMA_S = 0;          //initialization of EMA S
+	const uint16_t MaxPotReading = 650; // Maximum analogRead from pots
+	const uint8_t MinPotMove = 2; // Minimum value change before listeners are triggered
+	const float EMA_a = 0.01; // Filter alpha
+	float rightEMA_S = 0;
+	float leftEMA_S = 0;
 
 };
 

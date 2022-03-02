@@ -27,6 +27,6 @@ private:
 };
 
 extern SynthiaImpl Synthia;
-extern SliderInput slider;
-extern EncoderInput encoder;
+extern SliderInput Sliders;
+extern EncoderInput Encoders;
 #endif
