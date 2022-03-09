@@ -11,14 +11,16 @@ const i2s_pin_config_t i2s_pin_config = {
 		.data_in_num = I2S_DI
 };
 
-LEDmatrixImpl LEDmatrix;
-
 SynthiaImpl Synthia;
+SliderInput Sliders;
+EncoderInput Encoders;
 
-SynthiaImpl::SynthiaImpl(){}
+SynthiaImpl::SynthiaImpl(){
+
+}
 
 void SynthiaImpl::begin(){
-	Serial.println(115200);
+	Serial.begin(115200);
 
 	if(psramFound()){
 		Serial.printf("PSRAM init: %s, free: %d B\n", psramInit() ? "Yes" : "No", ESP.getFreePsram());
@@ -26,28 +28,23 @@ void SynthiaImpl::begin(){
 		Serial.println("No PSRAM detected");
 	}
 
-
 	disableCore0WDT();
 	disableCore1WDT();
 
 	WiFi.mode(WIFI_OFF);
 	btStop();
 
+	Sliders.begin();
+	Encoders.begin();
 
-	if(!LEDmatrix.begin(I2C_SDA, I2C_SCL)){
-		Serial.println("couldn't start matrix");
-		for(;;);
-	}
+	input = new InputGPIO();
+	input->preregisterButtons({ BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_ENC_L, BTN_ENC_R});
+	LoopManager::addListener(input);
 
 	if(!SPIFFS.begin()){
 		Serial.println("couldn't start SPIFFS");
 		for(;;);
 	}
-
-	input = new InputGPIO();
-//	InputGPIO::getInstance()->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5});
-	LoopManager::addListener(input);
-
 }
 
 Input* SynthiaImpl::getInput() const{
