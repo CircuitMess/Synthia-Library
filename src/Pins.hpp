@@ -21,10 +21,10 @@
 #define POT_L 2
 #define POT_R 36
 
-#define I2S_BCK -1
-#define I2S_WS -1
-#define I2S_DO -1
-#define I2S_DI -1
+#define I2S_BCK 21
+#define I2S_WS 4
+#define I2S_DO 14
+#define I2S_DI 15
 
 
 #endif //SYNTHIA_LIBRARY_PINS_HPP
