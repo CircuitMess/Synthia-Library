@@ -3,6 +3,7 @@
 #include <Loop/LoopManager.h>
 #include <SPIFFS.h>
 #include <WiFi.h>
+#include "NullOutput.hpp"
 
 const i2s_pin_config_t i2s_pin_config = {
 		.bck_io_num = I2S_BCK,
@@ -14,6 +15,15 @@ const i2s_pin_config_t i2s_pin_config = {
 SynthiaImpl Synthia;
 SliderInput Sliders;
 EncoderInput Encoders;
+
+NullOutput matrixOut(16, 9);
+Matrix trackMatrix(matrixOut);
+Matrix cursorMatrix(matrixOut);
+Matrix sliderMatrix(matrixOut);
+Matrix trackRGB(matrixOut);
+Matrix slotRGB(matrixOut);
+Matrix soloRGB(matrixOut);
+
 
 SynthiaImpl::SynthiaImpl(){
 
@@ -38,13 +48,20 @@ void SynthiaImpl::begin(){
 	Encoders.begin();
 
 	input = new InputGPIO();
-	input->preregisterButtons({ BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_ENC_L, BTN_ENC_R});
+	input->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_ENC_L, BTN_ENC_R});
 	LoopManager::addListener(input);
 
 	if(!SPIFFS.begin()){
 		Serial.println("couldn't start SPIFFS");
 		for(;;);
 	}
+
+	trackMatrix.begin();
+	cursorMatrix.begin();
+	sliderMatrix.begin();
+	trackRGB.begin();
+	slotRGB.begin();
+	soloRGB.begin();
 }
 
 Input* SynthiaImpl::getInput() const{
