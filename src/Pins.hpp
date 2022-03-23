@@ -18,7 +18,7 @@
 #define ENC_R1 33
 #define ENC_R2 26
 
-#define POT_L 2
+#define POT_L 39
 #define POT_R 36
 
 #define I2S_BCK 21
@@ -26,5 +26,8 @@
 #define I2S_DO 14
 #define I2S_DI 15
 
+#define RGB_R 5
+#define RGB_G 16
+#define RGB_B 2
 
 #endif //SYNTHIA_LIBRARY_PINS_HPP
