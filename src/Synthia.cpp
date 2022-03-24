@@ -3,7 +3,12 @@
 #include <Loop/LoopManager.h>
 #include <SPIFFS.h>
 #include <WiFi.h>
+#include <Devices/Matrix/MatrixOutput.h>
+#include "Output/RGBMatrixOutput.h"
 #include "NullOutput.hpp"
+#include <Devices/Matrix/MatrixOutputBuffer.h>
+#include <Devices/Matrix/MatrixPartOutput.h>
+
 
 const i2s_pin_config_t i2s_pin_config = {
 		.bck_io_num = I2S_BCK,
@@ -16,13 +21,16 @@ SynthiaImpl Synthia;
 SliderInput Sliders;
 EncoderInput Encoders;
 
-NullOutput matrixOut(16, 9);
-Matrix trackMatrix(matrixOut);
-Matrix cursorMatrix(matrixOut);
-Matrix sliderMatrix(matrixOut);
-Matrix trackRGB(matrixOut);
-Matrix slotRGB(matrixOut);
-Matrix soloRGB(matrixOut);
+RGBMatrixOutput SynthiaImpl::trackOutput(1, 5);
+RGBMatrixOutput SynthiaImpl::slotOutput(5, 1);
+
+NullOutput nullOut(16, 9);
+Matrix TrackMatrix(nullOut);
+Matrix CursorMatrix(nullOut);
+Matrix SlidersMatrix(nullOut);
+Matrix TrackRGB(SynthiaImpl::trackOutput);
+Matrix SlotRGB(SynthiaImpl::slotOutput);
+Matrix SoloRGB(nullOut);
 
 
 SynthiaImpl::SynthiaImpl(){
@@ -30,8 +38,6 @@ SynthiaImpl::SynthiaImpl(){
 }
 
 void SynthiaImpl::begin(){
-	Serial.begin(115200);
-
 	if(psramFound()){
 		Serial.printf("PSRAM init: %s, free: %d B\n", psramInit() ? "Yes" : "No", ESP.getFreePsram());
 	}else{
@@ -56,15 +62,63 @@ void SynthiaImpl::begin(){
 		for(;;);
 	}
 
-	trackMatrix.begin();
-	cursorMatrix.begin();
-	sliderMatrix.begin();
-	trackRGB.begin();
-	slotRGB.begin();
-	soloRGB.begin();
+	TrackMatrix.begin();
+	CursorMatrix.begin();
+	SlidersMatrix.begin();
+	SoloRGB.begin();
+
+	Wire.begin(I2C_SDA, I2C_SCL);
+	Wire.setClock(400000);
+
+/*	charlie = new IS31FL3731();
+	charlie->init();
+
+	MatrixOutputBuffer* buffer = new MatrixOutputBuffer(charlie);*/
+
+	// TODO: create MatrixPartOutput impls, set matrix outputs,
+
+	trackExp = new AW9523(Wire, 0x5A);
+	if(!trackExp->begin()){
+		printf("Track expander begin error\n");
+	}
+	trackExp->setCurrentLimit(AW9523::IMAX_1Q);
+
+	slotExp = new AW9523(Wire, 0x5B);
+	if(!slotExp->begin()){
+		printf("Slot expander begin error\n");
+	}
+	slotExp->setCurrentLimit(AW9523::IMAX_1Q);
+
+	trackOutput.set(trackExp, {
+			RGBMatrixOutput::PixelMapping { 14, 15, 13 },
+			RGBMatrixOutput::PixelMapping { 7, 12, 6 },
+			RGBMatrixOutput::PixelMapping { 4, 5, 3 },
+			RGBMatrixOutput::PixelMapping { 1, 2, 0 },
+			RGBMatrixOutput::PixelMapping { 10, 11, 9 }
+	});
+	trackOutput.init();
+	TrackRGB.begin();
+
+	slotOutput.set(slotExp, {
+			RGBMatrixOutput::PixelMapping { 9, 10, 8 },
+			RGBMatrixOutput::PixelMapping { 0, 1, 11 },
+			RGBMatrixOutput::PixelMapping { 3, 4, 2 },
+			RGBMatrixOutput::PixelMapping { 6, 7, 5 },
+			RGBMatrixOutput::PixelMapping { 13, 14, 12 }
+	});
+	slotOutput.init();
+	SlotRGB.begin();
 }
 
 Input* SynthiaImpl::getInput() const{
 	return input;
+}
+
+AW9523* SynthiaImpl::getSlotExp() const{
+	return slotExp;
+}
+
+AW9523* SynthiaImpl::getTrackExp() const{
+	return trackExp;
 }
 
