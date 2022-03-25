@@ -4,13 +4,17 @@
 #define I2C_SDA 23
 #define I2C_SCL 22
 
-#define BTN_5 19
-#define BTN_4 18
-#define BTN_3 5
-#define BTN_2 16
-#define BTN_1 17
+#define BTN_5 4
+#define BTN_4 3
+#define BTN_3 2
+#define BTN_2 1
+#define BTN_1 0
 #define BTN_ENC_L 35
 #define BTN_ENC_R 25
+
+#define INP_PL 12
+#define INP_CLK 18
+#define INP_MISO 27
 
 #define ENC_L1 34
 #define ENC_L2 32

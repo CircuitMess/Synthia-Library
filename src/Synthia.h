@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <CircuitOS.h>
 #include <Loop/LoopListener.h>
-#include <Input/InputGPIO.h>
+#include <Input/InputShift.h>
 #include <driver/i2s.h>
 #include <Devices/AW9523.h>
 #include "Input/SliderInput.h"
@@ -22,7 +22,7 @@ public:
 
 	void begin();
 
-	Input* getInput() const;
+	InputShift* getInput() const;
 	AW9523* getSlotExp() const;
 	AW9523* getTrackExp() const;
 
@@ -30,7 +30,7 @@ public:
 	static RGBMatrixOutput slotOutput;
 
 private:
-	Input* input;
+	InputShift* input;
 	IS31FL3731* charlie;
 	AW9523* slotExp;
 	AW9523* trackExp;

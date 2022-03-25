@@ -53,8 +53,9 @@ void SynthiaImpl::begin(){
 	Sliders.begin();
 	Encoders.begin();
 
-	input = new InputGPIO();
-	input->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_ENC_L, BTN_ENC_R});
+	input = new InputShift(INP_MISO, INP_CLK, INP_PL, 5);
+	input->begin();
+	input->preregisterButtons({ BTN_1, BTN_2, BTN_3, BTN_4, BTN_5 });
 	LoopManager::addListener(input);
 
 	if(!SPIFFS.begin()){
@@ -110,7 +111,7 @@ void SynthiaImpl::begin(){
 	SlotRGB.begin();
 }
 
-Input* SynthiaImpl::getInput() const{
+InputShift* SynthiaImpl::getInput() const{
 	return input;
 }
 
