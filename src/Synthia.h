@@ -13,6 +13,9 @@
 #include "Output/RGBMatrixOutput.h"
 #include <Devices/Matrix/Matrix.h>
 #include <Devices/Matrix/IS31FL3731.h>
+#include "Output/CursorMatrixOutput.h"
+#include "Output/SlidersMatrixOutput.h"
+#include "Output/TrackMatrixOutput.h"
 
 extern const i2s_pin_config_t i2s_pin_config;
 
@@ -26,26 +29,34 @@ public:
 	AW9523* getSlotExp() const;
 	AW9523* getTrackExp() const;
 
-	static RGBMatrixOutput trackOutput;
-	static RGBMatrixOutput slotOutput;
-
 private:
+	//hardware outputting
+	RGBMatrixOutput trackRGBOutput;
+	RGBMatrixOutput slotRGBOutput;
+	IS31FL3731 charlie;
+	TrackMatrixOutput trackOutput;
+	CursorMatrixOutput cursorOutput;
+	SlidersMatrixOutput slidersOutput;
+
+	MatrixOutputBuffer matrixBuffer;
+
 	InputShift* input;
-	IS31FL3731* charlie;
 	AW9523* slotExp;
 	AW9523* trackExp;
+
+public:
+
+	Matrix TrackMatrix; //main 16x5 partition
+	Matrix CursorMatrix; //16x1 strip below trackMatrix
+	Matrix SlidersMatrix; //2x8 strip next to sliders
+	Matrix TrackRGB; //2x5 RGB LEDs left and right from trackMatrix
+	Matrix SlotRGB; //5 RGB LEDs below the slot buttons
+	Matrix SoloRGB; //1 solo RGB LED in the top right corner
 
 };
 
 extern SynthiaImpl Synthia;
 extern SliderInput Sliders;
 extern EncoderInput Encoders;
-
-extern Matrix TrackMatrix; //main 16x5 partition
-extern Matrix CursorMatrix; //16x1 strip below trackMatrix
-extern Matrix SlidersMatrix; //2x8 strip next to sliders
-extern Matrix TrackRGB; //2x5 RGB LEDs left and right from trackMatrix
-extern Matrix SlotRGB; //5 RGB LEDs below the slot buttons
-extern Matrix SoloRGB; //1 solo RGB LED in the top right corner
 
 #endif
