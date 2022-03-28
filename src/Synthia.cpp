@@ -5,7 +5,6 @@
 #include <WiFi.h>
 #include <Devices/Matrix/MatrixOutput.h>
 #include "Output/RGBMatrixOutput.h"
-#include "NullOutput.hpp"
 #include <Devices/Matrix/MatrixOutputBuffer.h>
 #include <Devices/Matrix/MatrixPartOutput.h>
 
@@ -21,11 +20,8 @@ SynthiaImpl Synthia;
 SliderInput Sliders;
 EncoderInput Encoders;
 
-NullOutput nullOut(16, 9);
-
-
-SynthiaImpl::SynthiaImpl() : trackRGBOutput(1, 5), slotRGBOutput(5, 1), matrixBuffer(&charlie),
-							 TrackRGB(SynthiaImpl::trackRGBOutput), SlotRGB(SynthiaImpl::slotRGBOutput), SoloRGB(nullOut),
+SynthiaImpl::SynthiaImpl() : trackRGBOutput(1, 5), slotRGBOutput(5, 1), delayedOutput(&charlie, 100), matrixBuffer(&delayedOutput),
+							 TrackRGB(SynthiaImpl::trackRGBOutput), SlotRGB(SynthiaImpl::slotRGBOutput),
 							 trackOutput(&matrixBuffer), cursorOutput(&matrixBuffer), slidersOutput(&matrixBuffer),
 							 TrackMatrix(trackOutput), CursorMatrix(cursorOutput), SlidersMatrix(slidersOutput){
 
@@ -58,17 +54,16 @@ void SynthiaImpl::begin(){
 	}
 
 
-
 	Wire.begin(I2C_SDA, I2C_SCL);
 	Wire.setClock(400000);
 
 	charlie.init();
+	delayedOutput.init();
 	matrixBuffer.init();
 
 	TrackMatrix.begin();
 	CursorMatrix.begin();
 	SlidersMatrix.begin();
-	SoloRGB.begin();
 
 
 	trackExp = new AW9523(Wire, 0x5A);

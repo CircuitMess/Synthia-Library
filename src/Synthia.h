@@ -16,6 +16,7 @@
 #include "Output/CursorMatrixOutput.h"
 #include "Output/SlidersMatrixOutput.h"
 #include "Output/TrackMatrixOutput.h"
+#include <Devices/Matrix/DelayedMatrixOutput.h>
 
 extern const i2s_pin_config_t i2s_pin_config;
 
@@ -38,6 +39,7 @@ private:
 	CursorMatrixOutput cursorOutput;
 	SlidersMatrixOutput slidersOutput;
 
+	DelayedMatrixOutput delayedOutput;
 	MatrixOutputBuffer matrixBuffer;
 
 	InputShift* input;
@@ -45,13 +47,11 @@ private:
 	AW9523* trackExp;
 
 public:
-
 	Matrix TrackMatrix; //main 16x5 partition
 	Matrix CursorMatrix; //16x1 strip below trackMatrix
 	Matrix SlidersMatrix; //2x8 strip next to sliders
 	Matrix TrackRGB; //2x5 RGB LEDs left and right from trackMatrix
 	Matrix SlotRGB; //5 RGB LEDs below the slot buttons
-	Matrix SoloRGB; //1 solo RGB LED in the top right corner
 
 };
 
