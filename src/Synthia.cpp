@@ -5,7 +5,6 @@
 #include <WiFi.h>
 #include <Devices/Matrix/MatrixOutput.h>
 #include "Output/RGBMatrixOutput.h"
-#include "NullOutput.hpp"
 #include <Devices/Matrix/MatrixOutputBuffer.h>
 #include <Devices/Matrix/MatrixPartOutput.h>
 
@@ -21,19 +20,10 @@ SynthiaImpl Synthia;
 SliderInput Sliders;
 EncoderInput Encoders;
 
-RGBMatrixOutput SynthiaImpl::trackOutput(1, 5);
-RGBMatrixOutput SynthiaImpl::slotOutput(5, 1);
-
-NullOutput nullOut(16, 9);
-Matrix TrackMatrix(nullOut);
-Matrix CursorMatrix(nullOut);
-Matrix SlidersMatrix(nullOut);
-Matrix TrackRGB(SynthiaImpl::trackOutput);
-Matrix SlotRGB(SynthiaImpl::slotOutput);
-Matrix SoloRGB(nullOut);
-
-
-SynthiaImpl::SynthiaImpl(){
+SynthiaImpl::SynthiaImpl() : trackRGBOutput(1, 5), slotRGBOutput(5, 1), delayedOutput(&charlie, 100), matrixBuffer(&delayedOutput),
+							 TrackRGB(SynthiaImpl::trackRGBOutput), SlotRGB(SynthiaImpl::slotRGBOutput),
+							 trackOutput(&matrixBuffer), cursorOutput(&matrixBuffer), slidersOutput(&matrixBuffer),
+							 TrackMatrix(trackOutput), CursorMatrix(cursorOutput), SlidersMatrix(slidersOutput){
 
 }
 
@@ -55,7 +45,7 @@ void SynthiaImpl::begin(){
 
 	input = new InputShift(INP_MISO, INP_CLK, INP_PL, 5);
 	input->begin();
-	input->preregisterButtons({ BTN_1, BTN_2, BTN_3, BTN_4, BTN_5 });
+	input->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5});
 	LoopManager::addListener(input);
 
 	if(!SPIFFS.begin()){
@@ -63,20 +53,18 @@ void SynthiaImpl::begin(){
 		for(;;);
 	}
 
-	TrackMatrix.begin();
-	CursorMatrix.begin();
-	SlidersMatrix.begin();
-	SoloRGB.begin();
 
 	Wire.begin(I2C_SDA, I2C_SCL);
 	Wire.setClock(400000);
 
-/*	charlie = new IS31FL3731();
-	charlie->init();
+	charlie.init();
+	delayedOutput.init();
+	matrixBuffer.init();
 
-	MatrixOutputBuffer* buffer = new MatrixOutputBuffer(charlie);*/
+	TrackMatrix.begin();
+	CursorMatrix.begin();
+	SlidersMatrix.begin();
 
-	// TODO: create MatrixPartOutput impls, set matrix outputs,
 
 	trackExp = new AW9523(Wire, 0x5A);
 	if(!trackExp->begin()){
@@ -90,24 +78,24 @@ void SynthiaImpl::begin(){
 	}
 	slotExp->setCurrentLimit(AW9523::IMAX_1Q);
 
-	trackOutput.set(trackExp, {
-			RGBMatrixOutput::PixelMapping { 14, 15, 13 },
-			RGBMatrixOutput::PixelMapping { 7, 12, 6 },
-			RGBMatrixOutput::PixelMapping { 4, 5, 3 },
-			RGBMatrixOutput::PixelMapping { 1, 2, 0 },
-			RGBMatrixOutput::PixelMapping { 10, 11, 9 }
+	trackRGBOutput.set(trackExp, {
+			RGBMatrixOutput::PixelMapping{14, 15, 13},
+			RGBMatrixOutput::PixelMapping{7, 12, 6},
+			RGBMatrixOutput::PixelMapping{4, 5, 3},
+			RGBMatrixOutput::PixelMapping{1, 2, 0},
+			RGBMatrixOutput::PixelMapping{10, 11, 9}
 	});
-	trackOutput.init();
+	trackRGBOutput.init();
 	TrackRGB.begin();
 
-	slotOutput.set(slotExp, {
-			RGBMatrixOutput::PixelMapping { 9, 10, 8 },
-			RGBMatrixOutput::PixelMapping { 0, 1, 11 },
-			RGBMatrixOutput::PixelMapping { 3, 4, 2 },
-			RGBMatrixOutput::PixelMapping { 6, 7, 5 },
-			RGBMatrixOutput::PixelMapping { 13, 14, 12 }
+	slotRGBOutput.set(slotExp, {
+			RGBMatrixOutput::PixelMapping{9, 10, 8},
+			RGBMatrixOutput::PixelMapping{0, 1, 11},
+			RGBMatrixOutput::PixelMapping{3, 4, 2},
+			RGBMatrixOutput::PixelMapping{6, 7, 5},
+			RGBMatrixOutput::PixelMapping{13, 14, 12}
 	});
-	slotOutput.init();
+	slotRGBOutput.init();
 	SlotRGB.begin();
 }
 
