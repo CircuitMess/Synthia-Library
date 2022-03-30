@@ -39,7 +39,6 @@ private:
 	CursorMatrixOutput cursorOutput;
 	SlidersMatrixOutput slidersOutput;
 
-	DelayedMatrixOutput delayedOutput;
 	MatrixOutputBuffer matrixBuffer;
 
 	InputShift* input;

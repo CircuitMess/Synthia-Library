@@ -20,7 +20,7 @@ SynthiaImpl Synthia;
 SliderInput Sliders;
 EncoderInput Encoders;
 
-SynthiaImpl::SynthiaImpl() : trackRGBOutput(1, 5), slotRGBOutput(5, 1), delayedOutput(&charlie, 100), matrixBuffer(&delayedOutput),
+SynthiaImpl::SynthiaImpl() : trackRGBOutput(1, 5), slotRGBOutput(5, 1), matrixBuffer(&charlie),
 							 TrackRGB(SynthiaImpl::trackRGBOutput), SlotRGB(SynthiaImpl::slotRGBOutput),
 							 trackOutput(&matrixBuffer), cursorOutput(&matrixBuffer), slidersOutput(&matrixBuffer),
 							 TrackMatrix(trackOutput), CursorMatrix(cursorOutput), SlidersMatrix(slidersOutput){
@@ -58,7 +58,6 @@ void SynthiaImpl::begin(){
 	Wire.setClock(400000);
 
 	charlie.init();
-	delayedOutput.init();
 	matrixBuffer.init();
 
 	TrackMatrix.begin();
