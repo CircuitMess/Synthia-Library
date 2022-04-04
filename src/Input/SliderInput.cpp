@@ -54,9 +54,9 @@ void SliderInput::loop(uint time){
 	if(abs((int) cLeftPotValue - (int) leftPotPreviousValue) >= MinPotMove){
 		leftPotPreviousValue = leftPotValue = cLeftPotValue;
 
-		for(auto listeners: getListeners()){
-			listeners->leftPotMove(leftPotValue);
-		}
+		iterateListeners([this](SliderListener* l){
+			l->leftPotMove(leftPotValue);
+		});
 	}
 
 	if(rightPotPreviousValue == -1){
@@ -65,9 +65,9 @@ void SliderInput::loop(uint time){
 	if(abs((int) cRightPotValue - (int) rightPotPreviousValue) >= MinPotMove){
 		rightPotPreviousValue = rightPotValue = cRightPotValue;
 
-		for(auto listeners: getListeners()){
-			listeners->rightPotMove(rightPotValue);
-		}
+		iterateListeners([this](SliderListener* l){
+			l->rightPotMove(rightPotValue);
+		});
 	}
 }
 

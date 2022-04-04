@@ -40,15 +40,15 @@ void EncoderInput::loop(uint time){
 	prevStateRight = stateRight;
 
 	if(leftVal != 0){
-		for(auto listeners: getListeners()){
-			listeners->leftEncMove(leftVal);
-		}
+		iterateListeners([&leftVal](EncoderListener* l){
+			l->leftEncMove(leftVal);
+		});
 	}
 
 	if(rightVal != 0){
-		for(auto listeners: getListeners()){
-			listeners->rightEncMove(rightVal);
-		}
+		iterateListeners([&rightVal](EncoderListener* l){
+			l->rightEncMove(rightVal);
+		});
 	}
 }
 
