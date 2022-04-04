@@ -29,8 +29,8 @@ private:
 	uint8_t leftPotValue;
 	uint8_t rightPotValue;
 
-	uint8_t leftPotPreviousValue;
-	uint8_t rightPotPreviousValue;
+	int16_t leftPotPreviousValue = -1;
+	int16_t rightPotPreviousValue = -1;
 
 	uint16_t leftFilter(uint16_t sensorValue);
 	uint16_t rightFilter(uint16_t sensorValue);

@@ -48,6 +48,9 @@ void SliderInput::loop(uint time){
 	potValue = rightFilter(analogRead(POT_R));
 	uint16_t cRightPotValue = 255 - constrain(map(potValue, 0, MaxPotReading, 0, 255), 0, 255);
 
+	if(leftPotPreviousValue == -1){
+		leftPotPreviousValue = leftPotValue = cLeftPotValue;
+	}
 	if(abs((int) cLeftPotValue - (int) leftPotPreviousValue) >= MinPotMove){
 		leftPotPreviousValue = leftPotValue = cLeftPotValue;
 
@@ -56,6 +59,9 @@ void SliderInput::loop(uint time){
 		}
 	}
 
+	if(rightPotPreviousValue == -1){
+		rightPotPreviousValue = rightPotValue = cRightPotValue;
+	}
 	if(abs((int) cRightPotValue - (int) rightPotPreviousValue) >= MinPotMove){
 		rightPotPreviousValue = rightPotValue = cRightPotValue;
 

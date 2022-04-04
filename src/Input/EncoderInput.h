@@ -23,8 +23,8 @@ public:
 	void loop(uint time) override;
 
 private:
-	int prevStateLeft = 0;
-	int prevStateRight = 0;
+	int prevStateLeft = INT32_MAX;
+	int prevStateRight = INT32_MAX;
 
 };
 

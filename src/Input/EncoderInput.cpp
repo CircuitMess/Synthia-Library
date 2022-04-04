@@ -20,7 +20,7 @@ void EncoderInput::loop(uint time){
 	int8_t rightVal = 0;
 
 	int stateLeft = digitalRead(ENC_L1);
-	if(stateLeft != prevStateLeft){
+	if(stateLeft != prevStateLeft && prevStateLeft != INT32_MAX){
 		if(digitalRead(ENC_L2) != stateLeft){
 			leftVal = 1;
 		}else{
@@ -30,7 +30,7 @@ void EncoderInput::loop(uint time){
 	prevStateLeft = stateLeft;
 
 	int stateRight = digitalRead(ENC_R1);
-	if(stateRight != prevStateRight){
+	if(stateRight != prevStateRight && prevStateRight != INT32_MAX){
 		if(digitalRead(ENC_R2) != stateRight){
 			rightVal = 1;
 		}else{
