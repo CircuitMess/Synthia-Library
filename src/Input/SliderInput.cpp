@@ -14,19 +14,13 @@ void SliderInput::begin(){
 
 	potValue = analogRead(POT_L);
 	leftEMA_S = potValue;
-	leftPotPreviousValue = leftPotValue = 255 - constrain(map(potValue, 0, MaxPotReading, 0, 255), 0, 255);
+	leftPotValue = 255 - constrain(map(potValue, 0, MaxPotReading, 0, 255), 0, 255);
 
 	potValue = analogRead(POT_R);
 	rightEMA_S = potValue;
-	rightPotPreviousValue = rightPotValue = 255 - constrain(map(potValue, 0, MaxPotReading, 0, 255), 0, 255);
+	rightPotValue = 255 - constrain(map(potValue, 0, MaxPotReading, 0, 255), 0, 255);
 
-	if(rightPotValue % 2 != 0){
-		rightPotPreviousValue = --rightPotValue;
-	}
 
-	if(leftPotValue % 2 != 0){
-		leftPotPreviousValue = --leftPotValue;
-	}
 
 	LoopManager::addListener(this);
 }
@@ -53,7 +47,6 @@ void SliderInput::loop(uint time){
 	}
 	if(abs((int) cLeftPotValue - (int) leftPotPreviousValue) >= MinPotMove){
 		leftPotPreviousValue = leftPotValue = cLeftPotValue;
-
 		iterateListeners([this](SliderListener* l){
 			l->leftPotMove(leftPotValue);
 		});
