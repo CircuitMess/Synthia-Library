@@ -35,7 +35,8 @@ private:
 	uint16_t leftFilter(uint16_t sensorValue);
 	uint16_t rightFilter(uint16_t sensorValue);
 
-	const uint16_t MaxPotReading = 650; // Maximum analogRead from pots
+	const uint16_t MaxPotReading = 2700; // Maximum analogRead from pots
+	const uint16_t MinPotReading = 900; // Maximum analogRead from pots
 	const uint8_t MinPotMove = 2; // Minimum value change before listeners are triggered
 	const float EMA_a = 0.01; // Filter alpha
 	float rightEMA_S = 0;

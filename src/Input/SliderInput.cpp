@@ -14,11 +14,11 @@ void SliderInput::begin(){
 
 	potValue = analogRead(POT_L);
 	leftEMA_S = potValue;
-	leftPotValue = 255 - constrain(map(potValue, 0, MaxPotReading, 0, 255), 0, 255);
+	leftPotValue = 255 - constrain(map(potValue, MinPotReading, MaxPotReading, 0, 255), 0, 255);
 
 	potValue = analogRead(POT_R);
 	rightEMA_S = potValue;
-	rightPotValue = 255 - constrain(map(potValue, 0, MaxPotReading, 0, 255), 0, 255);
+	rightPotValue = 255 - constrain(map(potValue, MinPotReading, MaxPotReading, 0, 255), 0, 255);
 
 
 
@@ -37,10 +37,10 @@ void SliderInput::loop(uint time){
 	uint16_t potValue;
 
 	potValue = leftFilter(analogRead(POT_L));
-	uint16_t cLeftPotValue = 255 - constrain(map(potValue, 0, MaxPotReading, 0, 255), 0, 255);
+	uint16_t cLeftPotValue = 255 - constrain(map(potValue, MinPotReading, MaxPotReading, 0, 255), 0, 255);
 
 	potValue = rightFilter(analogRead(POT_R));
-	uint16_t cRightPotValue = 255 - constrain(map(potValue, 0, MaxPotReading, 0, 255), 0, 255);
+	uint16_t cRightPotValue = 255 - constrain(map(potValue, MinPotReading, MaxPotReading, 0, 255), 0, 255);
 
 	if(leftPotPreviousValue == -1){
 		leftPotPreviousValue = leftPotValue = cLeftPotValue;
