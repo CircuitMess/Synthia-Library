@@ -19,6 +19,7 @@
 #include "Output/SlotRGBOutput.h"
 #include "Output/TrackRGBOutput.h"
 #include <Devices/Matrix/DelayedMatrixOutput.h>
+#include <Input/InputGPIO.h>
 
 extern const i2s_pin_config_t i2s_pin_config;
 
@@ -29,6 +30,8 @@ public:
 	void begin();
 
 	InputShift* getInput() const;
+
+	int btnToSlot(uint8_t i);
 
 private:
 	//hardware outputting
