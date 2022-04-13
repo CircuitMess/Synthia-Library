@@ -32,7 +32,7 @@ public:
 	InputShift* getInput() const;
 
 	int btnToSlot(uint8_t i);
-
+	int slotToBtn(uint8_t i);
 private:
 	//hardware outputting
 	IS31FL3731 charlie;

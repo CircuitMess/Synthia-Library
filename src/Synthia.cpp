@@ -106,3 +106,17 @@ int SynthiaImpl::btnToSlot(uint8_t i){
 	if(pair == map.end()) return -1;
 	return pair->second;
 }
+
+int SynthiaImpl::slotToBtn(uint8_t i){
+	static const std::unordered_map<uint8_t, uint8_t> map = {
+			{ 0, BTN_1 },
+			{ 1, BTN_2 },
+			{ 2, BTN_3 },
+			{ 3, BTN_4 },
+			{ 4, BTN_5 },
+	};
+
+	auto pair = map.find(i);
+	if(pair == map.end()) return -1;
+	return pair->second;
+}
