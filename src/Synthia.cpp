@@ -7,7 +7,7 @@
 #include "Output/RGBMatrixOutput.h"
 #include <Devices/Matrix/MatrixOutputBuffer.h>
 #include <Devices/Matrix/MatrixPartOutput.h>
-
+#include <unordered_map>
 
 const i2s_pin_config_t i2s_pin_config = {
 		.bck_io_num = I2S_BCK,
@@ -90,4 +90,19 @@ void SynthiaImpl::begin(){
 
 InputShift* SynthiaImpl::getInput() const{
 	return input;
+}
+
+
+int SynthiaImpl::btnToSlot(uint8_t i){
+	static const std::unordered_map<uint8_t, uint8_t> map = {
+			{ BTN_1, 0 },
+			{ BTN_2, 1 },
+			{ BTN_3, 2 },
+			{ BTN_4, 3 },
+			{ BTN_5, 4 },
+	};
+
+	auto pair = map.find(i);
+	if(pair == map.end()) return -1;
+	return pair->second;
 }
