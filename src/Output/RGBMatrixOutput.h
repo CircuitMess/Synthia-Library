@@ -18,19 +18,10 @@ public:
 	void init() override;
 	void push(const MatrixPixelData& data) override;
 
-	static void IRAM_ATTR timerInterrupt();
-
 private:
 	ShiftOutput* output;
 	std::array<PixelMapping, 10> map;
 
-	std::array<std::array<uint8_t, 8>, 4> dutyCyles;
-	uint8_t duty = 0;
-
-	hw_timer_t* timer = nullptr;
-
-	static RGBMatrixOutput* rgb;
-	static std::vector<std::array<bool, 8>> ledStates;
 };
 
 
