@@ -1,35 +1,50 @@
+#include <Util/Timer.h>
 #include "RGBMatrixOutput.h"
 
-RGBMatrixOutput::RGBMatrixOutput(uint16_t width, uint16_t height) : MatrixOutput(width, height){
+RGBMatrixOutput* RGBMatrixOutput::rgb = nullptr;
+std::vector<std::array<bool, 8>> RGBMatrixOutput::ledStates(4);
 
+RGBMatrixOutput::RGBMatrixOutput() : MatrixOutput(10, 1){
+	rgb = this;
 }
 
-void RGBMatrixOutput::set(AW9523* expander, const std::array<PixelMapping, 5>& map){
-	this->expander = expander;
+void RGBMatrixOutput::set(ShiftOutput* output, const std::array<PixelMapping, 10>& map){
+	this->output = output;
 	this->map = map;
 }
 
 void RGBMatrixOutput::init(){
-	for(int i = 0; i < 5; i++){
-		expander->pinMode(map[i].pinR, AW9523::LED);
-		expander->pinMode(map[i].pinG, AW9523::LED);
-		expander->pinMode(map[i].pinB, AW9523::LED);
+	output->setAll(true);
 
-		expander->dim(map[i].pinR, 0);
-		expander->dim(map[i].pinG, 0);
-		expander->dim(map[i].pinB, 0);
-	}
+	timer = timerBegin(0, 80, true);
+	timerAttachInterrupt(timer, &timerInterrupt, true);    // P3= edge triggered
+
+	timerAlarmWrite(timer, 1000 * 8 / 100, true); // 125 Hz, 8 bit resolution
+	timerAlarmEnable(timer);
+	timerStart(timer);
 }
 
 void RGBMatrixOutput::push(const MatrixPixelData& data){
-	// TODO: optimize pushing to a single transaction
-	for(int i = 0; i < 5; i++){
-		const uint8_t x = min(i, data.getWidth() - 1);
-		const uint8_t y = min(i, data.getHeight() - 1);
-		MatrixPixel pixel = data.get(x, y);
-		pixel.i = 100;
-		expander->dim(map[i].pinR, pixel.r * pixel.i / 255);
-		expander->dim(map[i].pinB, pixel.g * pixel.i / 255);
-		expander->dim(map[i].pinG, pixel.b * pixel.i / 255);
+	for(int i = 0; i < 10; i++){
+		auto pinR = map[i].pinR;
+		auto pinG = map[i].pinG;
+		auto pinB = map[i].pinB;
+		auto pixel = data.get(i, 0);
+
+		dutyCyles[pinR.index][pinR.pin] = pixel.r * pixel.i / 255;
+		dutyCyles[pinG.index][pinG.pin] = pixel.g * pixel.i / 255;
+		dutyCyles[pinB.index][pinB.pin] = pixel.b * pixel.i / 255;
 	}
+}
+
+void IRAM_ATTR RGBMatrixOutput::timerInterrupt(){
+	rgb->duty++;
+
+	for(int i = 0; i < 4; i++){
+		for(int j = 0; j < 8; j++){
+			ledStates[i][j] = !(rgb->dutyCyles[i][j] != 0 && rgb->duty <= rgb->dutyCyles[i][j]);
+		}
+	}
+
+	rgb->output->send(ledStates);
 }

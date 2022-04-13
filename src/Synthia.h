@@ -16,6 +16,8 @@
 #include "Output/CursorMatrixOutput.h"
 #include "Output/SlidersMatrixOutput.h"
 #include "Output/TrackMatrixOutput.h"
+#include "Output/SlotRGBOutput.h"
+#include "Output/TrackRGBOutput.h"
 #include <Devices/Matrix/DelayedMatrixOutput.h>
 
 extern const i2s_pin_config_t i2s_pin_config;
@@ -27,23 +29,22 @@ public:
 	void begin();
 
 	InputShift* getInput() const;
-	AW9523* getSlotExp() const;
-	AW9523* getTrackExp() const;
 
 private:
 	//hardware outputting
-	RGBMatrixOutput trackRGBOutput;
-	RGBMatrixOutput slotRGBOutput;
 	IS31FL3731 charlie;
+	MatrixOutputBuffer charlieBuffer;
 	TrackMatrixOutput trackOutput;
 	CursorMatrixOutput cursorOutput;
 	SlidersMatrixOutput slidersOutput;
 
-	MatrixOutputBuffer matrixBuffer;
+	RGBMatrixOutput RGBOutput;
+	MatrixOutputBuffer RGBBuffer;
+	SlotRGBOutput slotRGBOutput;
+	TrackRGBOutput trackRGBOutput;
 
 	InputShift* input;
-	AW9523* slotExp;
-	AW9523* trackExp;
+	ShiftOutput RGBShiftOutput;
 
 public:
 	Matrix TrackMatrix; //main 16x5 partition

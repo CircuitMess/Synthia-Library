@@ -20,10 +20,10 @@ SynthiaImpl Synthia;
 SliderInput Sliders;
 EncoderInput Encoders;
 
-SynthiaImpl::SynthiaImpl() : trackRGBOutput(1, 5), slotRGBOutput(5, 1), matrixBuffer(&charlie),
-							 TrackRGB(SynthiaImpl::trackRGBOutput), SlotRGB(SynthiaImpl::slotRGBOutput),
-							 trackOutput(&matrixBuffer), cursorOutput(&matrixBuffer), slidersOutput(&matrixBuffer),
-							 TrackMatrix(trackOutput), CursorMatrix(cursorOutput), SlidersMatrix(slidersOutput){
+SynthiaImpl::SynthiaImpl() : charlieBuffer(&charlie), trackOutput(&charlieBuffer), cursorOutput(&charlieBuffer), slidersOutput(&charlieBuffer),
+							 TrackMatrix(trackOutput), CursorMatrix(cursorOutput), SlidersMatrix(slidersOutput),
+							 RGBShiftOutput(RGB_CLK, RGB_DATA), RGBBuffer(&RGBOutput), slotRGBOutput(&RGBBuffer), trackRGBOutput(&RGBBuffer),
+							 TrackRGB(trackRGBOutput), SlotRGB(slotRGBOutput){
 
 }
 
@@ -58,55 +58,36 @@ void SynthiaImpl::begin(){
 	Wire.setClock(400000);
 
 	charlie.init();
-	matrixBuffer.init();
+	// charlie.setBrightness(80);
 
 	TrackMatrix.begin();
 	CursorMatrix.begin();
 	SlidersMatrix.begin();
 
 
-	trackExp = new AW9523(Wire, 0x5A);
-	if(!trackExp->begin()){
-		printf("Track expander begin error\n");
-	}
-	trackExp->setCurrentLimit(AW9523::IMAX_1Q);
+	pinMode(RGB_CS, OUTPUT);
+	digitalWrite(RGB_CS, HIGH);
 
-	slotExp = new AW9523(Wire, 0x5B);
-	if(!slotExp->begin()){
-		printf("Slot expander begin error\n");
-	}
-	slotExp->setCurrentLimit(AW9523::IMAX_1Q);
+	RGBShiftOutput.begin();
 
-	trackRGBOutput.set(trackExp, {
-			RGBMatrixOutput::PixelMapping{14, 15, 13},
-			RGBMatrixOutput::PixelMapping{7, 12, 6},
-			RGBMatrixOutput::PixelMapping{4, 5, 3},
-			RGBMatrixOutput::PixelMapping{1, 2, 0},
-			RGBMatrixOutput::PixelMapping{10, 11, 9}
+	RGBOutput.set(&RGBShiftOutput, {
+		RGBMatrixOutput::PixelMapping{ { 0, 2 }, { 0, 1 }, { 0, 3 } },
+		RGBMatrixOutput::PixelMapping{ { 0, 7 }, { 0, 6 }, { 0, 0 } },
+		RGBMatrixOutput::PixelMapping{ { 0, 4 }, { 1, 0 }, { 0, 5 } },
+		RGBMatrixOutput::PixelMapping{ { 1, 2 }, { 1, 3 }, { 1, 1 } },
+		RGBMatrixOutput::PixelMapping{ { 1, 5 }, { 1, 6 }, { 1, 4 } },
+		RGBMatrixOutput::PixelMapping{ { 2, 5 }, { 2, 4 }, { 2, 6 } },
+		RGBMatrixOutput::PixelMapping{ { 2, 0 }, { 2, 7 }, { 2, 1 } },
+		RGBMatrixOutput::PixelMapping{ { 2, 3 }, { 2, 2 }, { 3, 4 } },
+		RGBMatrixOutput::PixelMapping{ { 3, 6 }, { 3, 5 }, { 3, 0 } },
+		RGBMatrixOutput::PixelMapping{ { 3, 2 }, { 3, 1 }, { 3, 3 } },
 	});
-	trackRGBOutput.init();
+	RGBOutput.init();
+
 	TrackRGB.begin();
-
-	slotRGBOutput.set(slotExp, {
-			RGBMatrixOutput::PixelMapping{9, 10, 8},
-			RGBMatrixOutput::PixelMapping{0, 1, 11},
-			RGBMatrixOutput::PixelMapping{3, 4, 2},
-			RGBMatrixOutput::PixelMapping{6, 7, 5},
-			RGBMatrixOutput::PixelMapping{13, 14, 12}
-	});
-	slotRGBOutput.init();
 	SlotRGB.begin();
 }
 
 InputShift* SynthiaImpl::getInput() const{
 	return input;
 }
-
-AW9523* SynthiaImpl::getSlotExp() const{
-	return slotExp;
-}
-
-AW9523* SynthiaImpl::getTrackExp() const{
-	return trackExp;
-}
-
