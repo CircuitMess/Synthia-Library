@@ -8,6 +8,7 @@
 #include <Devices/Matrix/MatrixOutputBuffer.h>
 #include <Devices/Matrix/MatrixPartOutput.h>
 #include <unordered_map>
+#include "Settings.h"
 
 const i2s_pin_config_t i2s_pin_config = {
 		.bck_io_num = I2S_BCK,
@@ -40,6 +41,7 @@ void SynthiaImpl::begin(){
 	WiFi.mode(WIFI_OFF);
 	btStop();
 
+	Settings.begin();
 	Sliders.begin();
 	Encoders.begin();
 
