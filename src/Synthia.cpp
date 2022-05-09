@@ -66,10 +66,6 @@ void SynthiaImpl::begin(){
 	CursorMatrix.begin();
 	SlidersMatrix.begin();
 
-
-	pinMode(RGB_CS, OUTPUT);
-	digitalWrite(RGB_CS, HIGH);
-
 	RGBShiftOutput.begin();
 
 	RGBOutput.set(&RGBShiftOutput, {

@@ -13,7 +13,7 @@
 #define BTN_ENC_R 4
 
 #define INP_PL 19
-#define INP_CLK 12
+#define INP_CLK 25
 #define INP_MISO 27
 
 #define ENC_L1 34
@@ -31,7 +31,6 @@
 #define I2S_DI 15
 
 #define RGB_CLK 12
-#define RGB_CS 25
 #define RGB_DATA { 5, 2, 26, 13 }
 
 #endif //SYNTHIA_LIBRARY_PINS_HPP
