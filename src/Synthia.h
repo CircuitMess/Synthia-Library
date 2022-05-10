@@ -20,6 +20,7 @@
 #include "Output/TrackRGBOutput.h"
 #include <Devices/Matrix/DelayedMatrixOutput.h>
 #include <Input/InputGPIO.h>
+#include "Settings.h"
 
 extern const i2s_pin_config_t i2s_pin_config;
 
@@ -28,6 +29,8 @@ public:
 	SynthiaImpl();
 
 	void begin();
+
+	void clearMatrices();
 
 	InputShift* getInput() const;
 

@@ -1,5 +1,4 @@
 #include "Synthia.h"
-#include "Pins.hpp"
 #include <Loop/LoopManager.h>
 #include <SPIFFS.h>
 #include <WiFi.h>
@@ -8,7 +7,6 @@
 #include <Devices/Matrix/MatrixOutputBuffer.h>
 #include <Devices/Matrix/MatrixPartOutput.h>
 #include <unordered_map>
-#include "Settings.h"
 
 const i2s_pin_config_t i2s_pin_config = {
 		.bck_io_num = I2S_BCK,
@@ -117,4 +115,12 @@ int SynthiaImpl::slotToBtn(uint8_t i){
 	auto pair = map.find(i);
 	if(pair == map.end()) return -1;
 	return pair->second;
+}
+
+void SynthiaImpl::clearMatrices(){
+	for(auto matrix : { Synthia.TrackMatrix, Synthia.SlidersMatrix, Synthia.CursorMatrix, Synthia.SlotRGB, Synthia.TrackRGB }){
+		matrix.stopAnimations();
+		matrix.clear();
+		matrix.push();
+	}
 }
