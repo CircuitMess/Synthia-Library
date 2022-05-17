@@ -5,10 +5,10 @@
 
 //contains the raw readings for the sliders' actual range
 struct SlidersCalibration {
-	uint16_t sliderLeftUp = 2500;
-	uint16_t sliderRightUp = 2500;
-	uint16_t sliderLeftDown = 1100;
-	uint16_t sliderRightDown = 1100;
+	uint16_t sliderLeftUp = 690;
+	uint16_t sliderRightUp = 690;
+	uint16_t sliderLeftDown = 220;
+	uint16_t sliderRightDown = 220;
 };
 
 struct SettingsData {
