@@ -14,6 +14,7 @@ struct SlidersCalibration {
 struct SettingsData {
 	bool tested = false;
 	SlidersCalibration calibration;
+	uint8_t brightness = 255;
 };
 
 class SettingsImpl {
