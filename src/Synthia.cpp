@@ -36,6 +36,9 @@ void SynthiaImpl::begin(){
 	disableCore0WDT();
 	disableCore1WDT();
 
+	analogReadResolution(10);
+	analogSetAttenuation(ADC_11db);
+
 	WiFi.mode(WIFI_OFF);
 	btStop();
 
