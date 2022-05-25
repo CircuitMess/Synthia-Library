@@ -58,7 +58,7 @@ void SynthiaImpl::begin(){
 	Wire.setClock(400000);
 
 	charlie.init();
-	// charlie.setBrightness(80);
+	charlie.setBrightness(Settings.get().brightness);
 
 	TrackMatrix.begin();
 	CursorMatrix.begin();
