@@ -3,7 +3,9 @@
 
 #include <Arduino.h>
 #include <CircuitOS.h>
+#include <CMAudio.h>
 #include <Loop/LoopListener.h>
+#include <Loop/LoopManager.h>
 #include <Input/InputShift.h>
 #include <driver/i2s.h>
 #include <Devices/AW9523.h>
