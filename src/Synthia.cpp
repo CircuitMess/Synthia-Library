@@ -1,6 +1,4 @@
 #include "Synthia.h"
-#include <Loop/LoopManager.h>
-#include <SPIFFS.h>
 #include <WiFi.h>
 #include <Devices/Matrix/MatrixOutput.h>
 #include "Output/RGBMatrixOutput.h"

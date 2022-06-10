@@ -21,6 +21,8 @@
 #include "Output/SlotRGBOutput.h"
 #include "Output/TrackRGBOutput.h"
 #include <Devices/Matrix/DelayedMatrixOutput.h>
+#include <Devices/Matrix/MatrixAnimGIF.h>
+#include <SPIFFS.h>
 #include <Input/InputGPIO.h>
 #include "Settings.h"
 
