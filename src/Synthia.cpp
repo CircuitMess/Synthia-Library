@@ -127,3 +127,7 @@ void SynthiaImpl::clearMatrices(){
 		matrix.push();
 	}
 }
+
+IS31FL3731& SynthiaImpl::getCharlie(){
+	return charlie;
+}

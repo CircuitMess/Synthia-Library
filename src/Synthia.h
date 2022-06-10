@@ -35,6 +35,7 @@ public:
 	void clearMatrices();
 
 	InputShift* getInput() const;
+	IS31FL3731& getCharlie();
 
 	int btnToSlot(uint8_t i);
 	int slotToBtn(uint8_t i);
