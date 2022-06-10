@@ -70,6 +70,10 @@ void SliderInput::loop(uint time){
 		iterateListeners([this](SliderListener* l){
 			l->leftPotMove(leftPotValue);
 		});
+
+		if(leftPotCallback){
+			leftPotCallback(leftPotValue);
+		}
 	}
 
 	if(rightPotPreviousValue == -1){
@@ -80,6 +84,10 @@ void SliderInput::loop(uint time){
 		iterateListeners([this](SliderListener* l){
 			l->rightPotMove(rightPotValue);
 		});
+
+		if(rightPotCallback){
+			rightPotCallback(rightPotValue);
+		}
 	}
 }
 
@@ -91,6 +99,14 @@ uint16_t SliderInput::leftFilter(uint16_t sensorValue){
 uint16_t SliderInput::rightFilter(uint16_t sensorValue){
 	rightEMA_S = (EMA_a * (float) sensorValue) + ((1.0f - EMA_a) * rightEMA_S);
 	return max(0.0, round(rightEMA_S));
+}
+
+void SliderInput::setLeftPotCallback(void (* leftPotCallback)(uint8_t)){
+	SliderInput::leftPotCallback = leftPotCallback;
+}
+
+void SliderInput::setRightPotCallback(void (* rightPotCallback)(uint8_t)){
+	SliderInput::rightPotCallback = rightPotCallback;
 }
 
 void SliderListener::rightPotMove(uint8_t value){ }

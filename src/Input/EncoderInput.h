@@ -22,9 +22,15 @@ public:
 	void begin();
 	void loop(uint time) override;
 
+	void setLeftEncCallback(void (* leftEncListener)(int8_t));
+	void setRightEncCallback(void (* rightEncListener)(int8_t));
+
 private:
 	int prevStateLeft = INT32_MAX;
 	int prevStateRight = INT32_MAX;
+
+	void (*leftEncCallback)(int8_t value) = nullptr;
+	void (*rightEncCallback)(int8_t value) = nullptr;
 
 };
 

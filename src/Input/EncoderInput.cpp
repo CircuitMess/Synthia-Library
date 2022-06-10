@@ -43,13 +43,29 @@ void EncoderInput::loop(uint time){
 		iterateListeners([&leftVal](EncoderListener* l){
 			l->leftEncMove(leftVal);
 		});
+
+		if(leftEncCallback){
+			leftEncCallback(leftVal);
+		}
 	}
 
 	if(rightVal != 0){
 		iterateListeners([&rightVal](EncoderListener* l){
 			l->rightEncMove(rightVal);
 		});
+
+		if(rightEncCallback){
+			rightEncCallback(rightVal);
+		}
 	}
+}
+
+void EncoderInput::setLeftEncCallback(void (* leftEncListener)(int8_t)){
+	EncoderInput::leftEncCallback = leftEncListener;
+}
+
+void EncoderInput::setRightEncCallback(void (* rightEncListener)(int8_t)){
+	EncoderInput::rightEncCallback = rightEncListener;
 }
 
 void EncoderListener::leftEncMove(int8_t amount){ }

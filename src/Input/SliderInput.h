@@ -62,6 +62,9 @@ public:
 	uint8_t getLeftPotValue() const;
 	uint8_t getRightPotValue() const;
 
+	void setLeftPotCallback(void (* leftPotCallback)(uint8_t));
+	void setRightPotCallback(void (* rightPotCallback)(uint8_t));
+
 private:
 	uint8_t leftPotValue;
 	uint8_t rightPotValue;
@@ -85,6 +88,9 @@ private:
 
 	int16_t leftPotRawPreviousValue = -1;
 	int16_t rightPotRawPreviousValue = -1;
+
+	void (*leftPotCallback)(uint8_t value) = nullptr;
+	void (*rightPotCallback)(uint8_t value) = nullptr;
 };
 
 #endif //SYNTHIA_LIBRARY_SLIDERINPUT_H
