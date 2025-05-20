@@ -19,8 +19,8 @@ EncoderInput Encoders;
 
 SynthiaImpl::SynthiaImpl() : charlieBuffer(&charlie), trackOutput(&charlieBuffer), cursorOutput(&charlieBuffer), slidersOutput(&charlieBuffer),
 							 TrackMatrix(trackOutput), CursorMatrix(cursorOutput), SlidersMatrix(slidersOutput),
-							 RGBShiftOutput(RGB_CLK, RGB_DATA), RGBBuffer(&RGBOutput), slotRGBOutput(&RGBBuffer), trackRGBOutput(&RGBBuffer),
-							 TrackRGB(trackRGBOutput), SlotRGB(slotRGBOutput){
+							 RGBBuffer(&RGBOutput), slotRGBOutput(&RGBBuffer), trackRGBOutput(&RGBBuffer),
+							 TrackRGB(trackRGBOutput), SlotRGB(slotRGBOutput), aw9523Slot(Wire), aw9523Track(Wire1){
 
 }
 
@@ -44,19 +44,25 @@ void SynthiaImpl::begin(){
 	Sliders.begin();
 	Encoders.begin();
 
-	input = new InputShift(INP_MISO, INP_CLK, INP_PL, 7);
-	input->begin();
+	Wire.begin(I2C_SDA_2, I2C_SCL_2);
+	Wire.setClock(400000);
+
+	inputExpander.begin(0b0100000, I2C_SDA_2, I2C_SCL_2);
+
+	input = new InputI2C(&inputExpander);
 	input->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_ENC_L, BTN_ENC_R});
 	LoopManager::addListener(input);
+
+
+	Wire1.begin(I2C_SDA_1, I2C_SCL_1);
+	Wire1.setClock(400000);
+
 
 	if(!SPIFFS.begin()){
 		Serial.println("couldn't start SPIFFS");
 		for(;;);
 	}
 
-
-	Wire.begin(I2C_SDA, I2C_SCL);
-	Wire.setClock(400000);
 
 	charlie.init();
 	charlie.setBrightness(Settings.get().brightness);
@@ -65,19 +71,21 @@ void SynthiaImpl::begin(){
 	CursorMatrix.begin();
 	SlidersMatrix.begin();
 
-	RGBShiftOutput.begin();
+	aw9523Track.begin();
+	aw9523Slot.begin();
 
-	RGBOutput.set(&RGBShiftOutput, {
-		RGBMatrixOutput::PixelMapping{ { 0, 2 }, { 0, 1 }, { 0, 3 } },
-		RGBMatrixOutput::PixelMapping{ { 0, 7 }, { 0, 6 }, { 0, 0 } },
-		RGBMatrixOutput::PixelMapping{ { 0, 4 }, { 1, 0 }, { 0, 5 } },
-		RGBMatrixOutput::PixelMapping{ { 1, 2 }, { 1, 3 }, { 1, 1 } },
-		RGBMatrixOutput::PixelMapping{ { 1, 5 }, { 1, 6 }, { 1, 4 } },
-		RGBMatrixOutput::PixelMapping{ { 2, 5 }, { 2, 4 }, { 2, 6 } },
-		RGBMatrixOutput::PixelMapping{ { 2, 0 }, { 2, 7 }, { 2, 1 } },
-		RGBMatrixOutput::PixelMapping{ { 2, 3 }, { 2, 2 }, { 3, 4 } },
-		RGBMatrixOutput::PixelMapping{ { 3, 6 }, { 3, 5 }, { 3, 0 } },
-		RGBMatrixOutput::PixelMapping{ { 3, 2 }, { 3, 1 }, { 3, 3 } },
+
+	RGBOutput.set(&aw9523Slot, &aw9523Track, {
+		RGBMatrixOutput::PixelMapping{ { 0, LED_R1 }, { 0, LED_G1 }, { 0, LED_B1 } },
+		RGBMatrixOutput::PixelMapping{ { 0, LED_R2 }, { 0, LED_G2 }, { 0, LED_B2 } },
+		RGBMatrixOutput::PixelMapping{ { 0, LED_R3 }, { 0, LED_G3 }, { 0, LED_B3 } },
+		RGBMatrixOutput::PixelMapping{ { 0, LED_R4 }, { 0, LED_G4 }, { 0, LED_B4 } },
+		RGBMatrixOutput::PixelMapping{ { 0, LED_R5 }, { 0, LED_G5 }, { 0, LED_B5 } },
+		RGBMatrixOutput::PixelMapping{ { 1, LED_R6 }, { 1, LED_G6 }, { 1, LED_B6 } },
+		RGBMatrixOutput::PixelMapping{ { 1, LED_R7 }, { 1, LED_G7 }, { 1, LED_B7 } },
+		RGBMatrixOutput::PixelMapping{ { 1, LED_R8 }, { 1, LED_G8 }, { 1, LED_B8 } },
+		RGBMatrixOutput::PixelMapping{ { 1, LED_R9 }, { 1, LED_G9 }, { 1, LED_B9 } },
+		RGBMatrixOutput::PixelMapping{ { 1, LED_R10 }, { 1, LED_G10 }, { 1, LED_B10 } }
 	});
 	RGBOutput.init();
 
@@ -85,7 +93,7 @@ void SynthiaImpl::begin(){
 	SlotRGB.begin();
 }
 
-InputShift* SynthiaImpl::getInput() const{
+Input* SynthiaImpl::getInput() const{
 	return input;
 }
 

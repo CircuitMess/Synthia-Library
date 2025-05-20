@@ -6,7 +6,7 @@
 #include <CMAudio.h>
 #include <Loop/LoopListener.h>
 #include <Loop/LoopManager.h>
-#include <Input/InputShift.h>
+#include <Input/InputI2C.h>
 #include <driver/i2s.h>
 #include <Devices/AW9523.h>
 #include "Input/SliderInput.h"
@@ -25,6 +25,7 @@
 #include <SPIFFS.h>
 #include <Input/InputGPIO.h>
 #include "Settings.h"
+#include <Input/I2cExpander.h>
 
 extern const i2s_pin_config_t i2s_pin_config;
 
@@ -36,7 +37,7 @@ public:
 
 	void clearMatrices();
 
-	InputShift* getInput() const;
+	Input* getInput() const;
 	IS31FL3731& getCharlie();
 
 	int btnToSlot(uint8_t i);
@@ -54,8 +55,10 @@ private:
 	SlotRGBOutput slotRGBOutput;
 	TrackRGBOutput trackRGBOutput;
 
-	InputShift* input;
-	ShiftOutput RGBShiftOutput;
+	InputI2C* input;
+	I2cExpander inputExpander;
+	AW9523 aw9523Track;
+	AW9523 aw9523Slot;
 
 public:
 	Matrix TrackMatrix; //main 16x5 partition

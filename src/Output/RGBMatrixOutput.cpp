@@ -5,17 +5,24 @@ RGBMatrixOutput::RGBMatrixOutput() : MatrixOutput(10, 1){
 
 }
 
-void RGBMatrixOutput::set(ShiftOutput* output, const std::array<PixelMapping, 10>& map){
-	this->output = output;
+void RGBMatrixOutput::set(AW9523* slotAW, AW9523* trackAW, const std::array<PixelMapping, 10>& map){
+	this->slotAW = slotAW;
+	this->trackAW = trackAW;
 	this->map = map;
 }
 
 void RGBMatrixOutput::init(){
-	output->setAll(true);
+	for(int i = 0; i < 16; ++i){
+		slotAW->pinMode(i, AW9523::OUT);
+		slotAW->write(i, true);
+
+		trackAW->pinMode(i, AW9523::OUT);
+		trackAW->write(i, true);
+	}
 }
 
 void RGBMatrixOutput::push(const MatrixPixelData& data){
-	auto state = output->get();
+	AW9523* expanders[] = { trackAW, slotAW };
 
 	for(int i = 0; i < 10; i++){
 		auto pinR = map[i].pinR;
@@ -23,10 +30,8 @@ void RGBMatrixOutput::push(const MatrixPixelData& data){
 		auto pinB = map[i].pinB;
 		auto pixel = data.get(i, 0);
 
-		state[pinR.index][pinR.pin] = (pixel.r * pixel.i / 255) < 255 / 2;
-		state[pinG.index][pinG.pin] = (pixel.g * pixel.i / 255) < 255 / 2;
-		state[pinB.index][pinB.pin] = (pixel.b * pixel.i / 255) < 255 / 2;
+		expanders[pinR.index]->write(pinR.pin, (pixel.r * pixel.i / 255) < (255 / 2));
+		expanders[pinG.index]->write(pinG.pin, (pixel.g * pixel.i / 255) < (255 / 2));
+		expanders[pinB.index]->write(pinB.pin, (pixel.b * pixel.i / 255) < (255 / 2));
 	}
-
-	output->set(state);
 }
