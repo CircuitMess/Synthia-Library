@@ -44,17 +44,17 @@ void SynthiaImpl::begin(){
 	Sliders.begin();
 	Encoders.begin();
 
-	Wire.begin(I2C_SDA_2, I2C_SCL_2);
+	Wire.begin(I2C_SDA_1, I2C_SCL_1);
 	Wire.setClock(400000);
 
-	inputExpander.begin(0b0100000, I2C_SDA_2, I2C_SCL_2);
+//	inputExpander.begin(0b0100000, I2C_SDA_2, I2C_SCL_2);
 
 	input = new InputI2C(&inputExpander);
 	input->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_ENC_L, BTN_ENC_R});
 	LoopManager::addListener(input);
 
 
-	Wire1.begin(I2C_SDA_1, I2C_SCL_1);
+	Wire1.begin(I2C_SDA_2, I2C_SCL_2);
 	Wire1.setClock(400000);
 
 
