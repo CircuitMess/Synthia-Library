@@ -13,11 +13,11 @@ void RGBMatrixOutput::set(AW9523* slotAW, AW9523* trackAW, const std::array<Pixe
 
 void RGBMatrixOutput::init(){
 	for(int i = 0; i < 16; ++i){
-		slotAW->pinMode(i, AW9523::OUT);
-		slotAW->write(i, true);
+		slotAW->pinMode(i, AW9523::LED);
+		slotAW->dim(i, 0);
 
-		trackAW->pinMode(i, AW9523::OUT);
-		trackAW->write(i, true);
+		trackAW->pinMode(i, AW9523::LED);
+		trackAW->dim(i, 0);
 	}
 }
 
@@ -30,8 +30,8 @@ void RGBMatrixOutput::push(const MatrixPixelData& data){
 		auto pinB = map[i].pinB;
 		auto pixel = data.get(i, 0);
 
-		expanders[pinR.index]->write(pinR.pin, (pixel.r * pixel.i / 255) < (255 / 2));
-		expanders[pinG.index]->write(pinG.pin, (pixel.g * pixel.i / 255) < (255 / 2));
-		expanders[pinB.index]->write(pinB.pin, (pixel.b * pixel.i / 255) < (255 / 2));
+		expanders[pinR.index]->dim(pinR.pin, std::round((float) (pixel.r * pixel.i) / 255.0f));
+		expanders[pinG.index]->dim(pinG.pin, std::round((float) (pixel.g * pixel.i) / 255.0f));
+		expanders[pinB.index]->dim(pinB.pin, std::round((float) (pixel.b * pixel.i) / 255.0f));
 	}
 }
