@@ -20,7 +20,7 @@ EncoderInput Encoders;
 SynthiaImpl::SynthiaImpl() : charlieBuffer(&charlie), trackOutput(&charlieBuffer), cursorOutput(&charlieBuffer), slidersOutput(&charlieBuffer),
 							 TrackMatrix(trackOutput), CursorMatrix(cursorOutput), SlidersMatrix(slidersOutput),
 							 RGBBuffer(&RGBOutput), slotRGBOutput(&RGBBuffer), trackRGBOutput(&RGBBuffer),
-							 TrackRGB(trackRGBOutput), SlotRGB(slotRGBOutput), aw9523Slot(Wire), aw9523Track(Wire1){
+							 TrackRGB(trackRGBOutput), SlotRGB(slotRGBOutput), aw9523Slot(Wire1, 0x5B), aw9523Track(Wire, 0x5B){
 
 }
 
@@ -47,15 +47,15 @@ void SynthiaImpl::begin(){
 	Wire.begin(I2C_SDA_1, I2C_SCL_1);
 	Wire.setClock(400000);
 
-//	inputExpander.begin(0b0100000, I2C_SDA_2, I2C_SCL_2);
+	Wire1.begin(I2C_SDA_2, I2C_SCL_2);
+	Wire1.setClock(400000);
+
+	inputExpander.begin(0b0100000, Wire1);
 
 	input = new InputI2C(&inputExpander);
 	input->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_ENC_L, BTN_ENC_R});
 	LoopManager::addListener(input);
 
-
-	Wire1.begin(I2C_SDA_2, I2C_SCL_2);
-	Wire1.setClock(400000);
 
 
 	if(!SPIFFS.begin()){
