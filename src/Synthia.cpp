@@ -23,6 +23,7 @@ SynthiaImpl::SynthiaImpl() : charlieBuffer(&charlie), trackOutput(&charlieBuffer
 							 RGBBuffer(&RGBOutput), slotRGBOutput(&RGBBuffer), trackRGBOutput(&RGBBuffer),
 							 TrackRGB(trackRGBOutput), SlotRGB(slotRGBOutput), aw9523Slot(Wire1, 0x5B), aw9523Track(Wire, 0x5B){
 
+	CircuitOS::gd_set_old_transparency(true);
 }
 
 void SynthiaImpl::begin(){
