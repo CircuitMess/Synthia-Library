@@ -70,12 +70,6 @@ void SynthiaImpl::begin(){
 	const auto brightness = map(Settings.get().brightness, 0, 255, 50, 150);
 	charlie.setBrightness(brightness);
 
-	if(HWRevision::get() > 0){
-		aw9523Slot.setCurrentLimit(AW9523::IMAX_1Q);
-		aw9523Track.setCurrentLimit(AW9523::IMAX_1Q);
-		Synthia.SlotRGB.setBrightness(Settings.get().brightness);
-		Synthia.TrackRGB.setBrightness(Settings.get().brightness);
-	}
 
 	TrackMatrix.begin();
 	CursorMatrix.begin();
@@ -101,6 +95,13 @@ void SynthiaImpl::begin(){
 
 	TrackRGB.begin();
 	SlotRGB.begin();
+
+	if(HWRevision::get() > 0){
+		aw9523Slot.setCurrentLimit(AW9523::IMAX_1Q);
+		aw9523Track.setCurrentLimit(AW9523::IMAX_1Q);
+		Synthia.SlotRGB.setBrightness(Settings.get().brightness);
+		Synthia.TrackRGB.setBrightness(Settings.get().brightness);
+	}
 }
 
 Input* SynthiaImpl::getInput() const{
