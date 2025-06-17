@@ -5,6 +5,7 @@
 #include <Devices/Matrix/MatrixOutputBuffer.h>
 #include <Devices/Matrix/MatrixPartOutput.h>
 #include <unordered_map>
+#include <Util/HWRevision.h>
 
 const i2s_pin_config_t i2s_pin_config = {
 		.bck_io_num = I2S_BCK,
@@ -65,7 +66,15 @@ void SynthiaImpl::begin(){
 
 
 	charlie.init();
-	charlie.setBrightness(Settings.get().brightness);
+	const auto brightness = map(Settings.get().brightness, 0, 255, 50, 150);
+	charlie.setBrightness(brightness);
+
+	if(HWRevision::get() > 0){
+		aw9523Slot.setCurrentLimit(AW9523::IMAX_1Q);
+		aw9523Track.setCurrentLimit(AW9523::IMAX_1Q);
+		Synthia.SlotRGB.setBrightness(Settings.get().brightness);
+		Synthia.TrackRGB.setBrightness(Settings.get().brightness);
+	}
 
 	TrackMatrix.begin();
 	CursorMatrix.begin();
