@@ -12,7 +12,7 @@
 #include "Input/SliderInput.h"
 #include "Input/EncoderInput.h"
 #include "Pins.hpp"
-#include "Output/RGBMatrixOutput.h"
+#include "Output/RGBExpanderOutput.h"
 #include <Devices/Matrix/Matrix.h>
 #include <Devices/Matrix/IS31FL3731.h>
 #include "Output/CursorMatrixOutput.h"
@@ -25,7 +25,9 @@
 #include <SPIFFS.h>
 #include <Input/InputGPIO.h>
 #include "Settings.h"
+#include "Output/RGBShiftOutput.h"
 #include <Input/I2cExpander.h>
+#include <Util/PinMap.h>
 
 extern const i2s_pin_config_t i2s_pin_config;
 
@@ -34,6 +36,7 @@ public:
 	SynthiaImpl();
 
 	void begin();
+	void initVer(int override = -1); // Initializes version and pins; also called from begin()
 
 	void clearMatrices();
 
@@ -50,15 +53,23 @@ private:
 	CursorMatrixOutput cursorOutput;
 	SlidersMatrixOutput slidersOutput;
 
-	RGBMatrixOutput RGBOutput;
 	MatrixOutputBuffer RGBBuffer;
 	SlotRGBOutput slotRGBOutput;
 	TrackRGBOutput trackRGBOutput;
 
-	InputI2C* input;
-	I2cExpander inputExpander;
-	AW9523 aw9523Track;
-	AW9523 aw9523Slot;
+	Input* input;
+
+	// HW v1
+	ShiftOutput* rgbShift = nullptr;
+	RGBShiftOutput* rgbShiftOut = nullptr;
+
+	// HW v2
+	I2cExpander* inputExpander = nullptr;
+	AW9523* aw9523Track;
+	AW9523* aw9523Slot;
+	RGBExpanderOutput* rgbExpOut = nullptr;
+
+	bool verInited = false;
 
 public:
 	Matrix TrackMatrix; //main 16x5 partition
@@ -72,5 +83,6 @@ public:
 extern SynthiaImpl Synthia;
 extern SliderInput Sliders;
 extern EncoderInput Encoders;
+extern PinMap<Pin> Pins;
 
 #endif

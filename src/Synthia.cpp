@@ -1,11 +1,13 @@
 #include "Synthia.h"
 #include <WiFi.h>
 #include <Devices/Matrix/MatrixOutput.h>
-#include "Output/RGBMatrixOutput.h"
+#include "Output/RGBExpanderOutput.h"
+#include "PinDef.h"
 #include <Devices/Matrix/MatrixOutputBuffer.h>
 #include <Devices/Matrix/MatrixPartOutput.h>
 #include <unordered_map>
 #include <Util/HWRevision.h>
+#include <Input/InputShift.h>
 
 const i2s_pin_config_t i2s_pin_config = {
 		.bck_io_num = I2S_BCK,
@@ -17,11 +19,12 @@ const i2s_pin_config_t i2s_pin_config = {
 SynthiaImpl Synthia;
 SliderInput Sliders;
 EncoderInput Encoders;
+PinMap<Pin> Pins;
 
 SynthiaImpl::SynthiaImpl() : charlieBuffer(&charlie), trackOutput(&charlieBuffer), cursorOutput(&charlieBuffer), slidersOutput(&charlieBuffer),
 							 TrackMatrix(trackOutput), CursorMatrix(cursorOutput), SlidersMatrix(slidersOutput),
-							 RGBBuffer(&RGBOutput), slotRGBOutput(&RGBBuffer), trackRGBOutput(&RGBBuffer),
-							 TrackRGB(trackRGBOutput), SlotRGB(slotRGBOutput), aw9523Slot(Wire1, 0x5B), aw9523Track(Wire, 0x5B){
+							 RGBBuffer(10, 1), slotRGBOutput(&RGBBuffer), trackRGBOutput(&RGBBuffer),
+							 TrackRGB(trackRGBOutput), SlotRGB(slotRGBOutput){
 
 	CircuitOS::gd_set_old_transparency(true);
 }
@@ -36,6 +39,8 @@ void SynthiaImpl::begin(){
 	disableCore0WDT();
 	disableCore1WDT();
 
+	initVer();
+
 	analogReadResolution(10);
 	analogSetAttenuation(ADC_11db);
 
@@ -46,18 +51,23 @@ void SynthiaImpl::begin(){
 	Sliders.begin();
 	Encoders.begin();
 
-	Wire.begin(I2C_SDA_1, I2C_SCL_1);
-	Wire.setClock(400000);
+	Wire.begin(Pins.get(Pin::I2C_Sda), Pins.get(Pin::I2C_Scl), 400000);
 
-	Wire1.begin(I2C_SDA_2, I2C_SCL_2);
-	Wire1.setClock(400000);
+	if(HWRevision::get() == 1){
+		Wire1.begin(Pins.get(Pin::I2C2_Sda), Pins.get(Pin::I2C2_Scl), 400000);
 
-	inputExpander.begin(0b0100000, Wire1);
+		inputExpander = new I2cExpander();
+		inputExpander->begin(0b0100000, Wire1);
 
-	input = new InputI2C(&inputExpander);
+		input = new InputI2C(inputExpander);
+	}else{
+		auto* shift = new InputShift(Pins.get(Pin::ShiftData), Pins.get(Pin::ShiftClk), Pins.get(Pin::ShiftPl), 7);
+		shift->begin();
+		input = shift;
+	}
+
 	input->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_ENC_L, BTN_ENC_R});
 	LoopManager::addListener(input);
-
 
 
 	if(!SPIFFS.begin()){
@@ -75,32 +85,73 @@ void SynthiaImpl::begin(){
 	CursorMatrix.begin();
 	SlidersMatrix.begin();
 
-	aw9523Track.begin();
-	aw9523Slot.begin();
+	if(HWRevision::get() == 1){
+		aw9523Track = new AW9523(Wire, 0x5B);
+		aw9523Slot = new AW9523(Wire1, 0x5B);
 
+		aw9523Track->begin();
+		aw9523Slot->begin();
 
-	RGBOutput.set(&aw9523Slot, &aw9523Track, {
-		RGBMatrixOutput::PixelMapping{ { 0, LED_R1 }, { 0, LED_G1 }, { 0, LED_B1 } },
-		RGBMatrixOutput::PixelMapping{ { 0, LED_R2 }, { 0, LED_G2 }, { 0, LED_B2 } },
-		RGBMatrixOutput::PixelMapping{ { 0, LED_R3 }, { 0, LED_G3 }, { 0, LED_B3 } },
-		RGBMatrixOutput::PixelMapping{ { 0, LED_R4 }, { 0, LED_G4 }, { 0, LED_B4 } },
-		RGBMatrixOutput::PixelMapping{ { 0, LED_R5 }, { 0, LED_G5 }, { 0, LED_B5 } },
-		RGBMatrixOutput::PixelMapping{ { 1, LED_R6 }, { 1, LED_G6 }, { 1, LED_B6 } },
-		RGBMatrixOutput::PixelMapping{ { 1, LED_R7 }, { 1, LED_G7 }, { 1, LED_B7 } },
-		RGBMatrixOutput::PixelMapping{ { 1, LED_R8 }, { 1, LED_G8 }, { 1, LED_B8 } },
-		RGBMatrixOutput::PixelMapping{ { 1, LED_R9 }, { 1, LED_G9 }, { 1, LED_B9 } },
-		RGBMatrixOutput::PixelMapping{ { 1, LED_R10 }, { 1, LED_G10 }, { 1, LED_B10 } }
-	});
-	RGBOutput.init();
+		aw9523Slot->setCurrentLimit(AW9523::IMAX_1Q);
+		aw9523Track->setCurrentLimit(AW9523::IMAX_1Q);
+
+		rgbExpOut = new RGBExpanderOutput();
+		rgbExpOut->set(aw9523Slot, aw9523Track, {
+				RGBExpanderOutput::PixelMapping{{ 0, (uint8_t) Pins.get(Pin::LED_R1) }, { 0, (uint8_t) Pins.get(Pin::LED_G1) }, { 0, (uint8_t) Pins.get(Pin::LED_B1) } },
+				RGBExpanderOutput::PixelMapping{{ 0, (uint8_t) Pins.get(Pin::LED_R2) }, { 0, (uint8_t) Pins.get(Pin::LED_G2) }, { 0, (uint8_t) Pins.get(Pin::LED_B2) } },
+				RGBExpanderOutput::PixelMapping{{ 0, (uint8_t) Pins.get(Pin::LED_R3) }, { 0, (uint8_t) Pins.get(Pin::LED_G3) }, { 0, (uint8_t) Pins.get(Pin::LED_B3) } },
+				RGBExpanderOutput::PixelMapping{{ 0, (uint8_t) Pins.get(Pin::LED_R4) }, { 0, (uint8_t) Pins.get(Pin::LED_G4) }, { 0, (uint8_t) Pins.get(Pin::LED_B4) } },
+				RGBExpanderOutput::PixelMapping{{ 0, (uint8_t) Pins.get(Pin::LED_R5) }, { 0, (uint8_t) Pins.get(Pin::LED_G5) }, { 0, (uint8_t) Pins.get(Pin::LED_B5) } },
+				RGBExpanderOutput::PixelMapping{{ 1, (uint8_t) Pins.get(Pin::LED_R6) }, { 1, (uint8_t) Pins.get(Pin::LED_G6) }, { 1, (uint8_t) Pins.get(Pin::LED_B6) } },
+				RGBExpanderOutput::PixelMapping{{ 1, (uint8_t) Pins.get(Pin::LED_R7) }, { 1, (uint8_t) Pins.get(Pin::LED_G7) }, { 1, (uint8_t) Pins.get(Pin::LED_B7) } },
+				RGBExpanderOutput::PixelMapping{{ 1, (uint8_t) Pins.get(Pin::LED_R8) }, { 1, (uint8_t) Pins.get(Pin::LED_G8) }, { 1, (uint8_t) Pins.get(Pin::LED_B8) } },
+				RGBExpanderOutput::PixelMapping{{ 1, (uint8_t) Pins.get(Pin::LED_R9) }, { 1, (uint8_t) Pins.get(Pin::LED_G9) }, { 1, (uint8_t) Pins.get(Pin::LED_B9) } },
+				RGBExpanderOutput::PixelMapping{{ 1, (uint8_t) Pins.get(Pin::LED_R10) }, { 1, (uint8_t) Pins.get(Pin::LED_G10) }, { 1, (uint8_t) Pins.get(Pin::LED_B10) } }
+		});
+		rgbExpOut->init();
+
+		RGBBuffer.setOutput(rgbExpOut);
+	}else{
+		rgbShift = new ShiftOutput(Pins.get(Pin::RGB_Clk), { (uint8_t) Pins.get(Pin::RGB_D1), (uint8_t) Pins.get(Pin::RGB_D2), (uint8_t) Pins.get(Pin::RGB_D3), (uint8_t) Pins.get(Pin::RGB_D4) });
+		rgbShift->begin();
+
+		rgbShiftOut = new RGBShiftOutput();
+		rgbShiftOut->set(rgbShift, {
+				RGBShiftOutput::PixelMapping{ { 0, 2 }, { 0, 1 }, { 0, 3 } },
+				RGBShiftOutput::PixelMapping{ { 0, 7 }, { 0, 6 }, { 0, 0 } },
+				RGBShiftOutput::PixelMapping{ { 0, 4 }, { 1, 0 }, { 0, 5 } },
+				RGBShiftOutput::PixelMapping{ { 1, 2 }, { 1, 3 }, { 1, 1 } },
+				RGBShiftOutput::PixelMapping{ { 1, 5 }, { 1, 6 }, { 1, 4 } },
+				RGBShiftOutput::PixelMapping{ { 2, 5 }, { 2, 4 }, { 2, 6 } },
+				RGBShiftOutput::PixelMapping{ { 2, 0 }, { 2, 7 }, { 2, 1 } },
+				RGBShiftOutput::PixelMapping{ { 2, 3 }, { 2, 2 }, { 3, 4 } },
+				RGBShiftOutput::PixelMapping{ { 3, 6 }, { 3, 5 }, { 3, 0 } },
+				RGBShiftOutput::PixelMapping{ { 3, 2 }, { 3, 1 }, { 3, 3 } },
+		});
+		rgbShiftOut->init();
+
+		RGBBuffer.setOutput(rgbShiftOut);
+	}
 
 	TrackRGB.begin();
 	SlotRGB.begin();
 
-	if(HWRevision::get() > 0){
-		aw9523Slot.setCurrentLimit(AW9523::IMAX_1Q);
-		aw9523Track.setCurrentLimit(AW9523::IMAX_1Q);
-		Synthia.SlotRGB.setBrightness(Settings.get().brightness);
-		Synthia.TrackRGB.setBrightness(Settings.get().brightness);
+	if(HWRevision::get() == 1){
+		SlotRGB.setBrightness(Settings.get().brightness);
+		TrackRGB.setBrightness(Settings.get().brightness);
+	}
+}
+
+void SynthiaImpl::initVer(int override){
+	if(verInited) return;
+	verInited = true;
+
+	const auto hw = override == -1 ? HWRevision::get() : override;
+
+	if(hw == 1){
+		Pins.set(Pins2);
+	}else{
+		Pins.set(Pins1);
 	}
 }
 

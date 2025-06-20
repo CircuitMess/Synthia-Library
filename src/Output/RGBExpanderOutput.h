@@ -1,5 +1,5 @@
-#ifndef SYNTHIA_LIBRARY_RGBMATRIXOUTPUT_H
-#define SYNTHIA_LIBRARY_RGBMATRIXOUTPUT_H
+#ifndef SYNTHIA_LIBRARY_RGBEXPANDEROUTPUT_H
+#define SYNTHIA_LIBRARY_RGBEXPANDEROUTPUT_H
 
 #include <Arduino.h>
 #include <Devices/Matrix/MatrixOutput.h>
@@ -7,7 +7,7 @@
 #include <array>
 
 // 10x1: 0-4 track matrix, 5-9 slot matrix
-class RGBMatrixOutput : public MatrixOutput {
+class RGBExpanderOutput : public MatrixOutput {
 public:
 	struct PixelPin {
 		uint8_t index; //Represents index of I2C expander, or shift register
@@ -18,7 +18,7 @@ public:
 		PixelPin pinR, pinG, pinB;
 	};
 
-	RGBMatrixOutput();
+	RGBExpanderOutput();
 
 	void set(AW9523* slotAW, AW9523* trackAW, const std::array<PixelMapping, 10>& map);
 
@@ -33,4 +33,4 @@ private:
 };
 
 
-#endif //SYNTHIA_LIBRARY_RGBMATRIXOUTPUT_H
+#endif //SYNTHIA_LIBRARY_RGBEXPANDEROUTPUT_H

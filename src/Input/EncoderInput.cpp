@@ -1,6 +1,6 @@
-#include <Loop/LoopManager.h>
 #include "EncoderInput.h"
-#include "../Pins.hpp"
+#include "../Synthia.h"
+#include <Loop/LoopManager.h>
 
 EncoderInput::EncoderInput(){
 

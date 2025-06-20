@@ -1,17 +1,17 @@
 #include <Util/Timer.h>
-#include "RGBMatrixOutput.h"
+#include "RGBExpanderOutput.h"
 
-RGBMatrixOutput::RGBMatrixOutput() : MatrixOutput(10, 1){
+RGBExpanderOutput::RGBExpanderOutput() : MatrixOutput(10, 1){
 
 }
 
-void RGBMatrixOutput::set(AW9523* slotAW, AW9523* trackAW, const std::array<PixelMapping, 10>& map){
+void RGBExpanderOutput::set(AW9523* slotAW, AW9523* trackAW, const std::array<PixelMapping, 10>& map){
 	this->slotAW = slotAW;
 	this->trackAW = trackAW;
 	this->map = map;
 }
 
-void RGBMatrixOutput::init(){
+void RGBExpanderOutput::init(){
 	for(int i = 0; i < 16; ++i){
 		slotAW->pinMode(i, AW9523::LED);
 		slotAW->dim(i, 0);
@@ -21,7 +21,7 @@ void RGBMatrixOutput::init(){
 	}
 }
 
-void RGBMatrixOutput::push(const MatrixPixelData& data){
+void RGBExpanderOutput::push(const MatrixPixelData& data){
 	AW9523* expanders[] = { trackAW, slotAW };
 
 	for(int i = 0; i < 10; i++){
