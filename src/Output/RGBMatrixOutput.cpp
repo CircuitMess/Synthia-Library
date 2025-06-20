@@ -29,7 +29,7 @@ void RGBMatrixOutput::push(const MatrixPixelData& data){
 		auto pinG = map[i].pinG;
 		auto pinB = map[i].pinB;
 		auto pixel = data.get(i, 0);
-		pixel.i = ::map(pixel.i, 0, 255, 1, 5);
+		pixel.i = ::map(pixel.i, 0, 255, 5, 20);
 
 		expanders[pinR.index]->dim(pinR.pin, std::round((float) (pixel.r * pixel.i) / 255.0f));
 		expanders[pinG.index]->dim(pinG.pin, std::round((float) (pixel.g * pixel.i) / 255.0f));
