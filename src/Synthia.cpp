@@ -53,7 +53,7 @@ void SynthiaImpl::begin(){
 
 	Wire.begin(Pins.get(Pin::I2C_Sda), Pins.get(Pin::I2C_Scl), 400000);
 
-	if(HWRevision::get() == 1){
+	if(ver == Ver::v2){
 		Wire1.begin(Pins.get(Pin::I2C2_Sda), Pins.get(Pin::I2C2_Scl), 400000);
 
 		inputExpander = new I2cExpander();
@@ -85,7 +85,7 @@ void SynthiaImpl::begin(){
 	CursorMatrix.begin();
 	SlidersMatrix.begin();
 
-	if(HWRevision::get() == 1){
+	if(ver == Ver::v2){
 		aw9523Track = new AW9523(Wire, 0x5B);
 		aw9523Slot = new AW9523(Wire1, 0x5B);
 
@@ -136,7 +136,7 @@ void SynthiaImpl::begin(){
 	TrackRGB.begin();
 	SlotRGB.begin();
 
-	if(HWRevision::get() == 1){
+	if(ver == Ver::v2){
 		SlotRGB.setBrightness(Settings.get().brightness);
 		TrackRGB.setBrightness(Settings.get().brightness);
 	}
@@ -149,8 +149,10 @@ void SynthiaImpl::initVer(int override){
 	const auto hw = override == -1 ? HWRevision::get() : override;
 
 	if(hw == 1){
+		ver = Ver::v2;
 		Pins.set(Pins2);
 	}else{
+		ver = Ver::v1;
 		Pins.set(Pins1);
 	}
 }

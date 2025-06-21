@@ -69,6 +69,7 @@ private:
 	AW9523* aw9523Slot;
 	RGBExpanderOutput* rgbExpOut = nullptr;
 
+	enum class Ver { v1, v2 } ver = Ver::v1;
 	bool verInited = false;
 
 public:
