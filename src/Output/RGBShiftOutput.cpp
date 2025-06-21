@@ -1,20 +1,19 @@
-#include <Util/Timer.h>
-#include "RGBMatrixOutput.h"
+#include "RGBShiftOutput.h"
 
-RGBMatrixOutput::RGBMatrixOutput() : MatrixOutput(10, 1){
+RGBShiftOutput::RGBShiftOutput() : MatrixOutput(10, 1){
 
 }
 
-void RGBMatrixOutput::set(ShiftOutput* output, const std::array<PixelMapping, 10>& map){
+void RGBShiftOutput::set(ShiftOutput* output, const std::array<PixelMapping, 10>& map){
 	this->output = output;
 	this->map = map;
 }
 
-void RGBMatrixOutput::init(){
+void RGBShiftOutput::init(){
 	output->setAll(true);
 }
 
-void RGBMatrixOutput::push(const MatrixPixelData& data){
+void RGBShiftOutput::push(const MatrixPixelData& data){
 	auto state = output->get();
 
 	for(int i = 0; i < 10; i++){

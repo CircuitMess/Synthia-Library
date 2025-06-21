@@ -6,13 +6,13 @@
 #include <CMAudio.h>
 #include <Loop/LoopListener.h>
 #include <Loop/LoopManager.h>
-#include <Input/InputShift.h>
+#include <Input/InputI2C.h>
 #include <driver/i2s.h>
 #include <Devices/AW9523.h>
 #include "Input/SliderInput.h"
 #include "Input/EncoderInput.h"
 #include "Pins.hpp"
-#include "Output/RGBMatrixOutput.h"
+#include "Output/RGBExpanderOutput.h"
 #include <Devices/Matrix/Matrix.h>
 #include <Devices/Matrix/IS31FL3731.h>
 #include "Output/CursorMatrixOutput.h"
@@ -25,6 +25,9 @@
 #include <SPIFFS.h>
 #include <Input/InputGPIO.h>
 #include "Settings.h"
+#include "Output/RGBShiftOutput.h"
+#include <Input/I2cExpander.h>
+#include <Util/PinMap.h>
 
 extern const i2s_pin_config_t i2s_pin_config;
 
@@ -33,10 +36,11 @@ public:
 	SynthiaImpl();
 
 	void begin();
+	void initVer(int override = -1); // Initializes version and pins; also called from begin()
 
 	void clearMatrices();
 
-	InputShift* getInput() const;
+	Input* getInput() const;
 	IS31FL3731& getCharlie();
 
 	int btnToSlot(uint8_t i);
@@ -49,13 +53,24 @@ private:
 	CursorMatrixOutput cursorOutput;
 	SlidersMatrixOutput slidersOutput;
 
-	RGBMatrixOutput RGBOutput;
 	MatrixOutputBuffer RGBBuffer;
 	SlotRGBOutput slotRGBOutput;
 	TrackRGBOutput trackRGBOutput;
 
-	InputShift* input;
-	ShiftOutput RGBShiftOutput;
+	Input* input;
+
+	// HW v1
+	ShiftOutput* rgbShift = nullptr;
+	RGBShiftOutput* rgbShiftOut = nullptr;
+
+	// HW v2
+	I2cExpander* inputExpander = nullptr;
+	AW9523* aw9523Track;
+	AW9523* aw9523Slot;
+	RGBExpanderOutput* rgbExpOut = nullptr;
+
+	enum class Ver { v1, v2 } ver = Ver::v1;
+	bool verInited = false;
 
 public:
 	Matrix TrackMatrix; //main 16x5 partition
@@ -69,5 +84,6 @@ public:
 extern SynthiaImpl Synthia;
 extern SliderInput Sliders;
 extern EncoderInput Encoders;
+extern PinMap<Pin> Pins;
 
 #endif
