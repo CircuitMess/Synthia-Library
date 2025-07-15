@@ -28,6 +28,7 @@
 #include "Output/RGBShiftOutput.h"
 #include <Input/I2cExpander.h>
 #include <Util/PinMap.h>
+#include <unordered_map>
 
 extern const i2s_pin_config_t i2s_pin_config;
 
@@ -78,6 +79,10 @@ public:
 	Matrix SlidersMatrix; //2x8 strip next to sliders
 	Matrix TrackRGB; //2x5 RGB LEDs left and right from trackMatrix
 	Matrix SlotRGB; //5 RGB LEDs below the slot buttons
+
+private:
+	std::unordered_map<uint8_t, uint8_t> btnToSlotMap;
+	std::unordered_map<uint8_t, uint8_t> slotToBtnMap;
 
 };
 

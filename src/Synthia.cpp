@@ -5,7 +5,6 @@
 #include "PinDef.h"
 #include <Devices/Matrix/MatrixOutputBuffer.h>
 #include <Devices/Matrix/MatrixPartOutput.h>
-#include <unordered_map>
 #include <Util/HWRevision.h>
 #include <Input/InputShift.h>
 
@@ -41,6 +40,22 @@ void SynthiaImpl::begin(){
 
 	initVer();
 
+	btnToSlotMap = {
+			{ BTN_1, 0 },
+			{ BTN_2, 1 },
+			{ BTN_3, 2 },
+			{ BTN_4, 3 },
+			{ BTN_5, 4 },
+	};
+
+	slotToBtnMap = {
+			{ 0, BTN_1 },
+			{ 1, BTN_2 },
+			{ 2, BTN_3 },
+			{ 3, BTN_4 },
+			{ 4, BTN_5 },
+	};
+
 	analogReadResolution(10);
 	analogSetAttenuation(ADC_11db);
 
@@ -66,7 +81,7 @@ void SynthiaImpl::begin(){
 		input = shift;
 	}
 
-	input->preregisterButtons({BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_ENC_L, BTN_ENC_R});
+	input->preregisterButtons({ BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_ENC_L, BTN_ENC_R });
 	LoopManager::addListener(input);
 
 
@@ -163,30 +178,16 @@ Input* SynthiaImpl::getInput() const{
 
 
 int SynthiaImpl::btnToSlot(uint8_t i){
-	static const std::unordered_map<uint8_t, uint8_t> map = {
-			{ BTN_1, 0 },
-			{ BTN_2, 1 },
-			{ BTN_3, 2 },
-			{ BTN_4, 3 },
-			{ BTN_5, 4 },
-	};
-
-	auto pair = map.find(i);
-	if(pair == map.end()) return -1;
+	auto pair = btnToSlotMap.find(i);
+	if(pair == btnToSlotMap.end()) return -1;
 	return pair->second;
 }
 
 int SynthiaImpl::slotToBtn(uint8_t i){
-	static const std::unordered_map<uint8_t, uint8_t> map = {
-			{ 0, BTN_1 },
-			{ 1, BTN_2 },
-			{ 2, BTN_3 },
-			{ 3, BTN_4 },
-			{ 4, BTN_5 },
-	};
+	static const
 
-	auto pair = map.find(i);
-	if(pair == map.end()) return -1;
+	auto pair = slotToBtnMap.find(i);
+	if(pair == slotToBtnMap.end()) return -1;
 	return pair->second;
 }
 
