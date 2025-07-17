@@ -63,6 +63,7 @@ const PinDefMap<Pin> Pins2 = {
 		{ Pin::I2S_Do,   14 },
 		{ Pin::I2S_Di,   15 },
 
+		//Schematic footprints had errors in v2.6 which swapped G and B channels for following LEDs:
 		// First AW9523 expander (track RGBs)
 		{ Pin::LED_B2,   0 },
 		{ Pin::LED_B1,   1 },

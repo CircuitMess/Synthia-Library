@@ -184,18 +184,16 @@ int SynthiaImpl::btnToSlot(uint8_t i){
 }
 
 int SynthiaImpl::slotToBtn(uint8_t i){
-	static const
-
 	auto pair = slotToBtnMap.find(i);
 	if(pair == slotToBtnMap.end()) return -1;
 	return pair->second;
 }
 
 void SynthiaImpl::clearMatrices(){
-	for(auto matrix : { Synthia.TrackMatrix, Synthia.SlidersMatrix, Synthia.CursorMatrix, Synthia.SlotRGB, Synthia.TrackRGB }){
-		matrix.stopAnimations();
-		matrix.clear();
-		matrix.push();
+	for(Matrix* matrix : { &TrackMatrix, &SlidersMatrix, &CursorMatrix, &SlotRGB, &TrackRGB }){
+		matrix->stopAnimations();
+		matrix->clear();
+		matrix->push();
 	}
 }
 
